@@ -11,6 +11,7 @@ import {
 } from "@workspace/ui/components/sidebar"
 import {
   BadgeCheckIcon,
+  BuildingIcon,
   KeyIcon,
   LinkIcon,
   SmartphoneIcon,
@@ -50,6 +51,14 @@ const NAV_ITEMS: SettingsNavItem[] = [
     title: "Connections",
     href: "/settings/connections",
     icon: LinkIcon,
+  },
+  // Sprint 2 (D7): flat entry pointing at the members page (D7 v1 scope =
+  // members only). When `general` (rename) or other org admin pages ship,
+  // switch to a parent/children pattern.
+  {
+    title: "Organization",
+    href: "/settings/organization/members",
+    icon: BuildingIcon,
   },
   {
     title: "Account",

@@ -7,6 +7,7 @@ import { toast } from "sonner"
 import { authClient } from "@/lib/auth-client"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
+import { Field } from "@/components/auth/field"
 import { profileSchema } from "@/components/settings/schemas"
 
 /**
@@ -14,6 +15,8 @@ import { profileSchema } from "@/components/settings/schemas"
  *
  * Email is intentionally not editable here — better-auth requires a separate
  * verification flow (`changeEmail`) routed via `/settings/account/email`.
+ *
+ * Uses the project-local `Field` wrapper for label + error rendering (F1.6).
  */
 export function ProfileForm() {
 	const { data: session } = authClient.useSession()
@@ -55,32 +58,29 @@ export function ProfileForm() {
 		>
 			<form.Field
 				name="name"
-				children={(field) => (
-					<div className="flex flex-col gap-2">
-						<label htmlFor="name" className="text-sm font-medium">
-							Name
-						</label>
-						<Input
-							id="name"
+				children={(field) => {
+					const errors = field.state.meta.errors
+						.map((err) => err?.message ?? "")
+						.filter(Boolean)
+					return (
+						<Field
 							name={field.name}
-							type="text"
-							autoComplete="name"
-							value={field.state.value}
-							onChange={(e) => field.handleChange(e.target.value)}
-							aria-invalid={!!field.state.meta.errors.length}
-							disabled={!user}
-						/>
-						{field.state.meta.errors.map((err) => (
-							<p
-								key={err?.message}
-								className="text-sm text-destructive"
-								role="alert"
-							>
-								{err?.message}
-							</p>
-						))}
-					</div>
-				)}
+							label="Name"
+							errors={errors}
+						>
+							<Input
+								id={field.name}
+								name={field.name}
+								type="text"
+								autoComplete="name"
+								value={field.state.value}
+								onChange={(e) => field.handleChange(e.target.value)}
+								aria-invalid={errors.length > 0}
+								disabled={!user}
+							/>
+						</Field>
+					)
+				}}
 			/>
 
 			<div className="flex flex-col gap-2">

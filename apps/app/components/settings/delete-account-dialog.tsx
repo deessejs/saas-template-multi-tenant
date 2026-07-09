@@ -16,7 +16,7 @@
  * success with `setTimeout` and is unsafe to ship — see audit §F1.1.
  *
  * Org-ownership caveat: better-auth refuses to delete a user who is the sole
- * `owner` of an organization. The server returns 403 with a code that mentions
+ * `owner` of an organization. The server returns a code that mentions
  * ownership. We surface that message verbatim in a toast.
  */
 import { useState } from "react"
@@ -27,6 +27,7 @@ import { authClient } from "@/lib/auth-client"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { PasswordInput } from "@/components/auth/password-input"
+import { Field } from "@/components/auth/field"
 import { DangerZone } from "@/components/settings"
 import { deleteAccountSchema } from "@/components/settings/schemas"
 
@@ -84,60 +85,54 @@ export function DeleteAccountDialog() {
 
 				<form.Field
 					name="confirm"
-					children={(field) => (
-						<div className="flex flex-col gap-2">
-							<label htmlFor="delete-confirm" className="text-sm font-medium">
-								Type &quot;DELETE&quot;
-							</label>
-							<Input
-								id="delete-confirm"
+					children={(field) => {
+						const errors = field.state.meta.errors
+							.map((err) => err?.message ?? "")
+							.filter(Boolean)
+						return (
+							<Field
 								name={field.name}
-								type="text"
-								autoComplete="off"
-								value={field.state.value}
-								onChange={(e) => field.handleChange(e.target.value)}
-								aria-invalid={!!field.state.meta.errors.length}
-								placeholder="DELETE"
-							/>
-							{field.state.meta.errors.map((err) => (
-								<p
-									key={err?.message}
-									className="text-sm text-destructive"
-									role="alert"
-								>
-									{err?.message}
-								</p>
-							))}
-						</div>
-					)}
+								label='Type "DELETE"'
+								errors={errors}
+							>
+								<Input
+									id={field.name}
+									name={field.name}
+									type="text"
+									autoComplete="off"
+									placeholder="DELETE"
+									value={field.state.value}
+									onChange={(e) => field.handleChange(e.target.value)}
+									aria-invalid={errors.length > 0}
+								/>
+							</Field>
+						)
+					}}
 				/>
 
 				<form.Field
 					name="password"
-					children={(field) => (
-						<div className="flex flex-col gap-2">
-							<label htmlFor="delete-password" className="text-sm font-medium">
-								Your password
-							</label>
-							<PasswordInput
-								id="delete-password"
+					children={(field) => {
+						const errors = field.state.meta.errors
+							.map((err) => err?.message ?? "")
+							.filter(Boolean)
+						return (
+							<Field
 								name={field.name}
-								autoComplete="current-password"
-								value={field.state.value}
-								onChange={(e) => field.handleChange(e.target.value)}
-								error={!!field.state.meta.errors.length}
-							/>
-							{field.state.meta.errors.map((err) => (
-								<p
-									key={err?.message}
-									className="text-sm text-destructive"
-									role="alert"
-								>
-									{err?.message}
-								</p>
-							))}
-						</div>
-					)}
+								label="Your password"
+								errors={errors}
+							>
+								<PasswordInput
+									id={field.name}
+									name={field.name}
+									autoComplete="current-password"
+									value={field.state.value}
+									onChange={(e) => field.handleChange(e.target.value)}
+									error={errors.length > 0}
+								/>
+							</Field>
+						)
+					}}
 				/>
 
 				<div className="flex justify-end">
