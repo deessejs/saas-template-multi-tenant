@@ -3,6 +3,7 @@
 import { useState, useRef, useImperativeHandle, forwardRef } from "react"
 import { EyeIcon, EyeOffIcon } from "lucide-react"
 import { Input } from "@workspace/ui/components/input"
+import { Button } from "@workspace/ui/components/button"
 
 interface PasswordInputProps extends Omit<React.ComponentProps<typeof Input>, "type"> {
   error?: boolean
@@ -28,10 +29,12 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
           aria-invalid={error}
           {...props}
         />
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="icon"
           aria-label={visible ? "Hide password" : "Show password"}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+          className="absolute right-1 top-1/2 size-7 -translate-y-1/2 text-muted-foreground hover:text-foreground"
           onClick={() => setVisible((v) => !v)}
         >
           {visible ? (
@@ -39,7 +42,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
           ) : (
             <EyeIcon className="size-4" />
           )}
-        </button>
+        </Button>
       </div>
     )
   }

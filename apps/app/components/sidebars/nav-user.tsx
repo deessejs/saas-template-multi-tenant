@@ -10,7 +10,6 @@ import {
 import {
 	DropdownMenu,
 	DropdownMenuContent,
-	DropdownMenuGroup,
 	DropdownMenuItem,
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
@@ -22,15 +21,10 @@ import {
 	SidebarMenuItem,
 	useSidebar,
 } from "@workspace/ui/components/sidebar"
-import {
-	ChevronsUpDownIcon,
-	SparklesIcon,
-	BadgeCheckIcon,
-	CreditCardIcon,
-	BellIcon,
-	LogOutIcon,
-} from "lucide-react"
+import { ChevronsUpDownIcon, LogOutIcon } from "lucide-react"
+import Link from "next/link"
 import { authClient } from "@/lib/auth-client"
+import { buildUserMenuItems } from "@/lib/user-menu-items"
 
 const VERCEL_AVATAR_BASE = "https://vercel.com/api/www/avatar"
 
@@ -44,6 +38,52 @@ function getInitials(name: string): string {
 function getAvatarUrl(email: string, image?: string | null): string {
 	if (image) return image
 	return `${VERCEL_AVATAR_BASE}?s=40&u=${encodeURIComponent(email)}&dpl=dpl_AS99V7XmtTzE4xdb72tYFtNTVV48`
+}
+
+/**
+ * Renders one entry from the `buildUserMenuItems()` config. Kept inline rather
+ * than extracted so the icon-to-component mapping stays obvious at the call site.
+ */
+function renderMenuItem(
+	item: ReturnType<typeof buildUserMenuItems>[number],
+	loggingOut: boolean,
+) {
+	if (item.kind === "link") {
+		const Icon = item.icon
+		return (
+			<DropdownMenuItem asChild>
+				<Link href={item.href}>
+					<Icon />
+					<span>{item.label}</span>
+				</Link>
+			</DropdownMenuItem>
+		)
+	}
+	if (item.kind === "action") {
+		// Log-out gets the in-flight disabled state and dynamic label.
+		// This is the only action today; if more in-flight actions are added,
+		// lift this state into the config (e.g. add `inFlight?: boolean` to
+		// the action variant).
+		const isLogOut = item.label === "Log out"
+		return (
+			<DropdownMenuItem
+				onClick={item.onClick}
+				disabled={isLogOut ? loggingOut : false}
+				aria-busy={isLogOut ? loggingOut : false}
+			>
+				<LogOutIcon />
+				<span>{isLogOut && loggingOut ? "Signing out…" : item.label}</span>
+			</DropdownMenuItem>
+		)
+	}
+	// disabled
+	const Icon = item.icon
+	return (
+		<DropdownMenuItem disabled title={item.tooltip}>
+			<Icon />
+			<span>{item.label}</span>
+		</DropdownMenuItem>
+	)
 }
 
 export function NavUser() {
@@ -62,6 +102,11 @@ export function NavUser() {
 			},
 		})
 	}
+
+	const menuItems = buildUserMenuItems({
+		accountHref: "/settings/account",
+		handleLogout,
+	})
 
 	// No session — render an anonymous "Guest" placeholder
 	if (!user) {
@@ -124,36 +169,12 @@ export function NavUser() {
 							</div>
 						</DropdownMenuLabel>
 						<DropdownMenuSeparator />
-						<DropdownMenuGroup>
-							<DropdownMenuItem>
-								<SparklesIcon />
-								Upgrade to Pro
-							</DropdownMenuItem>
-						</DropdownMenuGroup>
-						<DropdownMenuSeparator />
-						<DropdownMenuGroup>
-							<DropdownMenuItem>
-								<BadgeCheckIcon />
-								Account
-							</DropdownMenuItem>
-							<DropdownMenuItem>
-								<CreditCardIcon />
-								Billing
-							</DropdownMenuItem>
-							<DropdownMenuItem>
-								<BellIcon />
-								Notifications
-							</DropdownMenuItem>
-						</DropdownMenuGroup>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem
-							onClick={handleLogout}
-							disabled={loggingOut}
-							aria-busy={loggingOut}
-						>
-							<LogOutIcon />
-							{loggingOut ? "Signing out…" : "Log out"}
-						</DropdownMenuItem>
+						{menuItems.map((item, idx) => (
+							<div key={`${item.kind}-${item.label}`}>
+								{idx > 0 && <DropdownMenuSeparator />}
+								{renderMenuItem(item, loggingOut)}
+							</div>
+						))}
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</SidebarMenuItem>

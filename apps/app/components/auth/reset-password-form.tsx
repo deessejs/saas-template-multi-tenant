@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { useForm } from "@tanstack/react-form"
 import { toast } from "sonner"
 import { authClient } from "@/lib/auth-client"
@@ -15,7 +14,6 @@ interface ResetPasswordFormProps {
 }
 
 export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
-	const router = useRouter()
 	const [done, setDone] = useState(false)
 
 	const form = useForm({

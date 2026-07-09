@@ -11,6 +11,12 @@ export function useIsMobile() {
       setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
     }
     mql.addEventListener("change", onChange)
+    // Sync the initial value from window.matchMedia on mount. This is the canonical
+    // shadcn-shipped pattern (https://ui.shadcn.com/docs/hooks/use-mobile) — there is
+    // no React-friendly way to read `window.innerWidth` during render (would cause
+    // hydration mismatch). The setState here is a one-shot synchronization, not a
+    // cascading render.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
     return () => mql.removeEventListener("change", onChange)
   }, [])
