@@ -7,12 +7,15 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "test:run": "vitest run"
   },
   "dependencies": {
     "@nanostores/react": "^1.0.0",
     "@orpc/client": "catalog:",
     "@orpc/server": "catalog:",
+    "@sindresorhus/slugify": "catalog:",
     "@workspace/api": "workspace:*",
     "@workspace/auth": "workspace:*",
     "@workspace/env": "workspace:*",
@@ -35,6 +38,7 @@
     "@workspace/typescript-config": "workspace:*",
     "eslint": "^9",
     "tailwindcss": "^4",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

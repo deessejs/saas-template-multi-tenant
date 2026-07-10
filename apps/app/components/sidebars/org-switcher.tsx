@@ -3,6 +3,7 @@
 import { useTransition } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 import {
   DropdownMenu,
@@ -35,6 +36,7 @@ function getOrgInitials(name: string): string {
 
 export function OrgSwitcher() {
   const { isMobile } = useSidebar()
+  const router = useRouter()
   const [, startTransition] = useTransition()
 
   const { data: organizations } = orgClient.useListOrganizations()
@@ -97,6 +99,11 @@ export function OrgSwitcher() {
                     await orgClient.organization.setActive({
                       organizationId: org.id,
                     })
+                    // State → URL alignment (per the source-of-truth rule
+                    // in temp/reports/auth/2026-07-10-dashboard-not-org-scoped.md §5).
+                    // The cookie is now updated, navigate to the new
+                    // org's home so the URL reflects the active org.
+                    router.push(`/${org.slug}/home`)
                   })
                 }}
                 className="gap-2 p-2"

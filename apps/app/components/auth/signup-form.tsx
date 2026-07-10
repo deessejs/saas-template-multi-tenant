@@ -71,7 +71,12 @@ function OAuthButtons() {
 
 	async function handleOAuth(provider: "google" | "github") {
 		setLoading(provider)
-		await authClient.signIn.social({ provider, callbackURL: "/home" })
+		// OAuth's signInSocial does not run the requireEmailVerification check
+		// (sign-in.mjs:230 lives inside signInEmail only). OAuth providers
+		// return emailVerified from the provider, so social users land
+		// directly in the dispatcher as verified. Route through "/" so the
+		// dispatcher picks the right destination.
+		await authClient.signIn.social({ provider, callbackURL: "/" })
 	}
 
 	return (
@@ -123,19 +128,34 @@ export function SignupForm() {
 			onSubmit: signupSchema,
 		},
 		onSubmit: async ({ value }) => {
-			const { error } = await authClient.signUp.email(
-				{
-					email: value.email,
-					password: value.password,
-					name: value.name,
-				},
-				{
-					onSuccess: () => router.push("/home"),
-				},
-			)
+			const { error } = await authClient.signUp.email({
+				email: value.email,
+				password: value.password,
+				name: value.name,
+				// callbackURL="/" ensures that after the user clicks the
+				// verification link, better-auth creates the session and
+				// redirects to "/". The root dispatcher in app/page.tsx then
+				// routes based on session state (no session → /login,
+				// unverified → /verify-email, no active org → /onboarding,
+				// active org → /home). We still push to /verify-email
+				// below so the user sees the "check your email" UI before
+				// they leave the tab to check their inbox.
+				callbackURL: "/",
+			})
 			if (error) {
 				toast.error(error.message ?? "Could not create account")
+				return
 			}
+			// better-auth skips auto-sign-in when `requireEmailVerification: true`
+			// (sign-up.mjs:161-162), so the user has no session here. Send them
+			// to /verify-email which shows the "check your email" UI and a resend
+			// button. The verification link in the email hits
+			// /api/auth/verify-email and — thanks to
+			// `autoSignInAfterVerification: true` in packages/auth/src/auth.ts —
+			// creates a session and follows callbackURL="/" to the dispatcher.
+			router.push(
+				`/verify-email?email=${encodeURIComponent(value.email)}`,
+			)
 		},
 	})
 

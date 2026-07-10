@@ -44,41 +44,6 @@ Returns:
 
 ---
 
-## useActiveOrganization — Stale Cache Bug — [#9710](https://github.com/better-auth/better-auth/issues/9710)
-
-**Read [`pitfalls.md`](./pitfalls.md) §3 before using this hook.**
-
-`useActiveOrganization()` may return stale `null` after sign-in because `$activeOrgSignal` does not invalidate on `/sign-in/email`. The fix PRs ([#9736](https://github.com/better-auth/better-auth/pull/9736), [#9737](https://github.com/better-auth/better-auth/pull/9737)) are pending.
-
-**Workaround:** forward `$sessionSignal` invalidations to `$activeOrgSignal`:
-
-```ts
-// apps/app/src/lib/auth-client.ts
-import { createAuthClient } from "better-auth/client"
-import { organizationClient } from "better-auth/client/plugins"
-
-export const authClient = createAuthClient({
-  plugins: [organizationClient()],
-})
-
-// Workaround for #9710: useActiveOrganization returns stale null after sign-in
-let initialized = false
-authClient.$sessionSignal.subscribe(() => {
-  if (initialized) {
-    // Invalidate the active org signal on any session change
-    // This forces useActiveOrganization to re-read from the server
-    authClient.$activeOrgSignal.value = null
-  }
-  initialized = true
-})
-```
-
-After applying this, `useActiveOrganization()` will return the correct org on sign-in. The `null` write triggers an invalidation cycle that forces a fresh fetch.
-
-**Source:** [better-auth.com/docs/plugins/organization](https://better-auth.com/docs/plugins/organization) — `setActiveOrganization` and client hooks. Related: [#9710](https://github.com/better-auth/better-auth/issues/9710), [#3837](https://github.com/better-auth/better-auth/issues/3837) (`setActiveOrganization` doesn't update other hooks).
-
----
-
 ## useActiveOrganization — Core API
 
 ```ts

@@ -24,25 +24,19 @@ export const auth = betterAuth({
 
 ---
 
-## Auto-Create Org on Signup
+## User-Created Org via Onboarding
 
-We do **not** use `autoCreateOrganizationOnSignUp` — it was removed (see [`pitfalls.md`](./pitfalls.md) §1). Instead, the org is created in `databaseHooks.session.create.before`. See [`hooks.md`](./hooks.md) for the full implementation.
+The first organization is created explicitly by the user at `/onboarding` after sign-up, not via a `databaseHooks` server-side auto-create. This avoids the stale-`useActiveOrganization()` state described in [better-auth #9710](https://github.com/better-auth/better-auth/issues/9710): `authClient.organization.create` is a client-driven mutation that correctly invalidates `$activeOrgSignal` and `$sessionSignal`.
 
-**Source:** [PR #4755](https://github.com/better-auth/better-auth/pull/4755) — removal of the unimplemented option. [Issue #4334](https://github.com/better-auth/better-auth/issues/4334) — original report.
+Flow: `/signup → /onboarding → authClient.organization.create({ name, slug }) → /home`.
 
-Slug generation (40 char max, URL-safe):
+The `slug` is required by better-auth's endpoint (`crud-org.mjs:14` — `slug: z.string().min(1)`) and is **not** derived server-side. Derivation lives in `apps/app/lib/slug.ts` (`deriveSlug(name)`), with collision detection via `authClient.organization.checkOrganizationSlug` and retry on race conditions. See `temp/reports/auth/2026-07-10-organization-create-requires-slug-400.md` for the full design.
 
-```ts
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/[\s_-]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 40)
-}
-```
+The proxy guard at `apps/app/proxy.ts:68-75` redirects any signed-in user without `activeOrganizationId` (excluding `/accept-invitation`) to `/onboarding`. The routing is already in place; only the page itself is required.
+
+**Why we don't auto-create server-side anymore:** the previous approach (`databaseHooks.session.create.before` calling `auth.api.createOrganization`) bypassed the client-side atom invalidation entirely, since the mutation never went through a better-auth client call. PRs [#9736](https://github.com/better-auth/better-auth/pull/9736) and [#9737](https://github.com/better-auth/better-auth/pull/9737) on the better-auth side would have fixed the invalidation; instead, we removed the auto-create and made the org creation a normal client-driven action.
+
+**Source:** [better-auth.com/docs/plugins/organization](https://better-auth.com/docs/plugins/organization) — `create` reference.
 
 ---
 
@@ -159,7 +153,20 @@ organizationHooks: {
 },
 ```
 
-**Note on [#9710](https://github.com/better-auth/better-auth/issues/9710):** `setActiveOrganization` updates the server session row correctly, but `useActiveOrganization()` on the client may still return stale `null`. See [`pitfalls.md`](./pitfalls.md) §3 for the workaround.
+The `acceptInvitation` path matches the organization plugin's atomListeners (`path === "/organization/accept-invitation"`), which invalidates `$activeOrgSignal` and `$sessionSignal` on the client. No hard reload is needed after accepting.
+
+## URL as the Source of Truth (Org-Scoped Routing)
+
+Once the dashboard is org-scoped (see `temp/reports/auth/2026-07-10-dashboard-not-org-scoped.md`), the **URL is the authoritative org selector**. `useActiveOrganization()` must agree with `params.org_slug`. Mismatches are resolved in one direction only:
+
+- **URL → state:** when the user navigates to `/${someOrgSlug}/home` and `someOrgSlug` differs from the active org, `app/(protected)/[org_slug]/layout.tsx` calls `auth.api.setActiveOrganization({ organizationSlug: someOrgSlug })` server-side to bring the cookie in line. The user is allowed through only if they are a member of `someOrgSlug`; otherwise they are redirected to `/onboarding`.
+- **State → URL:** when `OrgSwitcher` switches the active org, it calls `router.push(`/${newOrg.slug}/home`)` (via `useRouter`) so the URL stays in sync. Without this, the sidebar items and breadcrumb-style UI updates would race against the URL.
+
+Helper functions:
+- Server: `getActiveOrgSlug()` in `apps/app/lib/active-org.ts` (resolves `session.session.activeOrganizationId` → `slug` via `auth.api.listOrganizations`).
+- Client: `useActiveOrgSlug()` in `apps/app/lib/active-org.ts` (wraps `useActiveOrganization()` and extracts `.slug`).
+
+Both return `null` when the user has no active org.
 
 **Source:** [better-auth.com/docs/plugins/organization](https://better-auth.com/docs/plugins/organization) — `afterAcceptInvitation` hook.
 

@@ -17,6 +17,7 @@ import {
   SmartphoneIcon,
   UserIcon,
 } from "lucide-react"
+import { useActiveOrgSlug } from "@/lib/use-active-org-slug"
 
 type SettingsNavChild = {
   title: string
@@ -28,9 +29,11 @@ type SettingsNavItem = {
   href: string
   icon: typeof UserIcon
   children?: SettingsNavChild[]
+  // If true, href is a template and the active org slug is prepended at render.
+  orgScoped?: boolean
 }
 
-const NAV_ITEMS: SettingsNavItem[] = [
+const PERSONAL_ITEMS: SettingsNavItem[] = [
   {
     title: "Profile",
     href: "/settings/profile",
@@ -52,14 +55,6 @@ const NAV_ITEMS: SettingsNavItem[] = [
     href: "/settings/connections",
     icon: LinkIcon,
   },
-  // Sprint 2 (D7): flat entry pointing at the members page (D7 v1 scope =
-  // members only). When `general` (rename) or other org admin pages ship,
-  // switch to a parent/children pattern.
-  {
-    title: "Organization",
-    href: "/settings/organization/members",
-    icon: BuildingIcon,
-  },
   {
     title: "Account",
     href: "/settings/account",
@@ -71,14 +66,24 @@ const NAV_ITEMS: SettingsNavItem[] = [
   },
 ]
 
+const ORG_ITEM: SettingsNavItem = {
+  title: "Organization",
+  // Rendered with the active org slug prepended (see useActiveOrgSlug below).
+  href: "/settings/members",
+  icon: BuildingIcon,
+  orgScoped: true,
+}
+
 export function SettingsNav() {
   const pathname = usePathname()
+  const orgSlug = useActiveOrgSlug()
 
   return (
     <SidebarGroup>
       <SidebarGroupContent>
         <SidebarMenu>
-          {NAV_ITEMS.map((item) => {
+          {/* Personal settings (user-scoped). */}
+          {PERSONAL_ITEMS.map((item) => {
             const Icon = item.icon
             const isActive =
               pathname === item.href ||
@@ -112,6 +117,28 @@ export function SettingsNav() {
               </SidebarMenuItem>
             )
           })}
+
+          {/* Org settings (org-scoped, only when an active org exists). */}
+          {orgSlug && (() => {
+            const Icon = ORG_ITEM.icon
+            const orgHref = `/${orgSlug}${ORG_ITEM.href}`
+            const isActive =
+              pathname === orgHref || pathname.startsWith(`${orgHref}/`)
+            return (
+              <SidebarMenuItem key={orgHref}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={isActive}
+                  tooltip={ORG_ITEM.title}
+                >
+                  <Link href={orgHref}>
+                    <Icon className="size-4" />
+                    <span>{ORG_ITEM.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )
+          })()}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>

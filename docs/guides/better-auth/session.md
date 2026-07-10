@@ -62,7 +62,15 @@ Cached sessions are encrypted (JWE) using the auth secret. The DB is still queri
 
 ### Secure Cookies
 
-Cookies are `httpOnly` and `secure` by default in production (`NODE_ENV=production`). Do **not** set `useSecureCookies: true` unconditionally — it breaks local dev without HTTPS. See [`pitfalls.md`](./pitfalls.md) §4.
+Cookies are `httpOnly` and `secure` by default in production (`NODE_ENV=production`). In dev, the `Secure` flag is dropped so cookies stick on `http://localhost`:
+
+```ts
+advanced: {
+  useSecureCookies: process.env.NODE_ENV === "production",
+},
+```
+
+Do **not** set `useSecureCookies: true` unconditionally — it breaks local dev without HTTPS. The previous §4 in [`pitfalls.md`](./pitfalls.md) tracked this; it is now resolved.
 
 **Source:** [better-auth.com/docs/concepts/cookies](https://better-auth.com/docs/concepts/cookies) — "cookies are secure only in production by default."
 

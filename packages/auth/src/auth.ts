@@ -1,4 +1,4 @@
-import { betterAuth, type Session } from "better-auth"
+import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "@better-auth/drizzle-adapter"
 import { nextCookies } from "better-auth/next-js"
 import { db } from "@workspace/database"
@@ -6,8 +6,6 @@ import * as schema from "@workspace/database"
 import { serverEnv } from "@workspace/env/server"
 import { sendAuthEmail, templates } from "@workspace/email"
 import { organization } from "better-auth/plugins"
-
-import { slugify } from "./utils"
 
 /**
  * Organization plugin options shared between the runtime auth instance and the
@@ -73,6 +71,20 @@ export const auth = betterAuth({
   },
 
   emailVerification: {
+    // Send a verification email on signup. Without this, brand-new users
+    // have `emailVerified = false` and cannot sign in (since
+    // `requireEmailVerification: true` above enforces verification).
+    // In dev, the email is logged to the console via the Resend + console
+    // setup in packages/email — the verification link is in the terminal.
+    sendOnSignUp: true,
+    // `shouldSkipAutoSignIn` is true when `requireEmailVerification: true`
+    // (see sign-up.mjs:161-162). So sign-up does NOT create a session.
+    // Without `autoSignInAfterVerification: true`, the verification endpoint
+    // would mark the email verified but leave the user not-logged-in —
+    // they'd have to manually re-type their credentials at /login. With
+    // this set, the verification endpoint creates a session + setSessionCookie,
+    // redirecting them into the app fully authenticated.
+    autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url }) => {
       await sendAuthEmail({
         to: user.email,
@@ -89,52 +101,30 @@ export const auth = betterAuth({
   },
 
   advanced: {
-    useSecureCookies: true,
+    // In production, mark cookies Secure (HTTPS-only). In dev (HTTP), drop
+    // the Secure flag so cookies stick on http://localhost. Without this
+    // guard, browsers silently drop the Set-Cookie header on HTTP origins
+    // and sessions never persist client-side.
+    // See docs/guides/better-auth/pitfalls.md (former §4) for context.
+    useSecureCookies: process.env.NODE_ENV === "production",
   },
 
   experimental: {
     joins: true,
   },
 
-  // Auto-create an org on every signup — fires BEFORE the session row is
-  // written. Returning activeOrganizationId sets it in the session.
-  databaseHooks: {
-    session: {
-      create: {
-        before: async (
-          session: Session & {
-            user?: { name?: string | null; email?: string } | null
-          },
-        ) => {
-          const userName =
-            session.user?.name ?? session.user?.email?.split("@")[0] ?? "Personal"
-
-          const org = await (auth.api as any).createOrganization({
-            body: {
-              name: `${userName}'s workspace`,
-              slug: slugify(userName),
-              // userId omitted → better-auth uses the session user
-            },
-            headers: new Headers(),
-          })
-
-          return {
-            data: {
-              ...session,
-              activeOrganizationId: org.id,
-            },
-          }
-        },
-      },
-    },
-  },
-
+  // Org creation happens at /onboarding via authClient.organization.create,
+  // which correctly invalidates the active-org atom on the client (avoids
+  // [better-auth #9710](https://github.com/better-auth/better-auth/issues/9710)).
   plugins: [
     organization({
       ...organizationPluginOptions,
       // After accepting an invitation, set the invited org as the active one.
       organizationHooks: {
         afterAcceptInvitation: async ({ organization: org }) => {
+          // `setActiveOrganization` is not in better-auth's public TS surface
+          // (TS2883). Cast through `any` to access the runtime method.
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           await (auth.api as any).setActiveOrganization({
             body: { organizationId: org.id },
             headers: new Headers(),

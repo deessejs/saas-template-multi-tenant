@@ -188,8 +188,10 @@ export function MembersManager() {
       return
     }
     toast.success("You left the organization")
-    // Force a reload so proxy.ts can re-evaluate and redirect to /onboarding
-    if (typeof window !== "undefined") window.location.href = "/home"
+    // After leave, the user has no active org. The dispatcher at "/" routes
+    // to /onboarding (no active org case) and resets the session atom.
+    // Hard reload is used because the cookie change is server-side.
+    if (typeof window !== "undefined") window.location.href = "/"
   }
 
   if (!session?.user) return null

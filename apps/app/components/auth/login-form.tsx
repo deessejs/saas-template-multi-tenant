@@ -18,7 +18,12 @@ function OAuthButtons() {
 
 	async function handleOAuth(provider: "google" | "github") {
 		setLoading(provider)
-		await authClient.signIn.social({ provider, callbackURL: "/home" })
+		// OAuth's signInSocial does not run the requireEmailVerification check
+		// (sign-in.mjs:230 lives inside signInEmail only). OAuth providers
+		// return emailVerified from the provider, so social users land
+		// directly in the dispatcher as verified. Route through "/" so the
+		// dispatcher picks the right destination.
+		await authClient.signIn.social({ provider, callbackURL: "/" })
 	}
 
 	return (
@@ -68,8 +73,16 @@ export function LoginForm() {
 			onSubmit: loginSchema,
 		},
 		onSubmit: async ({ value }) => {
-			const { error } = await authClient.signIn.email(value, {
-				onSuccess: () => router.push("/home"),
+			// callbackURL="/" is passed in the body so better-auth returns
+			// Location: "/" on success — we rely on the JS client to follow
+			// that Location (which lands on the dispatcher). onSuccess is
+			// belt-and-suspenders in case the client does not follow redirects
+			// in-place for a verified user.
+			const { error } = await authClient.signIn.email({
+				...value,
+				callbackURL: "/",
+			}, {
+				onSuccess: () => router.push("/"),
 			})
 			if (error) {
 				toast.error(error.message ?? "Invalid credentials")

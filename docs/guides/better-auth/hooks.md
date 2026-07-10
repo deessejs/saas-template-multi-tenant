@@ -47,43 +47,13 @@ The `before` hook can **merge** data back into the session object via `{ data: .
 
 ---
 
-## Session.create.before — Key Use Case
+## Session.create.before — No longer used for org auto-create
 
-This is the hook used for auto-creating the user's personal organization on signup:
+This hook is no longer used to auto-create an organization on signup. Org creation now happens at `/onboarding` via `authClient.organization.create` (a client-driven mutation that correctly invalidates the active-org atom — see [better-auth #9710](https://github.com/better-auth/better-auth/issues/9710) and [`org.md`](./org.md)).
 
-```ts
-databaseHooks: {
-  session: {
-    create: {
-      before: async (session) => {
-        const userName =
-          session.user?.name ??
-          session.user?.email?.split("@")[0] ??
-          "Personal"
+The hook is still available for other use cases (e.g., enriching the session row, adding default claims). Just do not use it to call `auth.api.createOrganization` — that pattern caused a stale `useActiveOrganization()` on the client because the server-side mutation bypassed the client's atom invalidation.
 
-        const org = await (auth.api as any).createOrganization({
-          body: {
-            name: `${userName}'s workspace`,
-            slug: slugify(userName),
-          },
-          headers: new Headers(),
-        })
-
-        return {
-          data: {
-            ...session,
-            activeOrganizationId: org.id,
-          },
-        }
-      },
-    },
-  },
-},
-```
-
-**Why this works:** the org is created inside the before hook using `auth.api.createOrganization`, which means the membership row exists before the session is committed. This may bypass [#9070](https://github.com/better-auth/better-auth/issues/9070) — see [`pitfalls.md`](./pitfalls.md) §2 for the full test plan.
-
-**Source:** [better-auth.com/docs/plugins/organization](https://better-auth.com/docs/plugins/organization) — docs for `setActiveOrganization` via `databaseHooks`.
+**Source:** [better-auth.com/docs/concepts/database](https://better-auth.com/docs/concepts/database) — `databaseHooks` reference.
 
 ---
 

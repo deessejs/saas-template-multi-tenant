@@ -7,6 +7,7 @@ import { NavUser } from "@/components/sidebars/nav-user"
 import { SettingsNav } from "@/components/sidebars/settings-nav"
 import { SidebarBackAction } from "@/components/sidebar-back-action"
 import { OrgSwitcher } from "@/components/sidebars/org-switcher"
+import { useActiveOrgSlug } from "@/lib/use-active-org-slug"
 import {
   Sidebar,
   SidebarContent,
@@ -22,14 +23,19 @@ import {
 
 import { Home, Settings } from "lucide-react"
 
-const dashboardNav = [
-  {
-    title: "Home",
-    url: "/",
-    icon: <Home />,
-    items: [],
-  },
-]
+// Items are templated at render time: the org-scoped Home is derived from
+// the active org's slug via useActiveOrgSlug().
+function useDashboardNav() {
+  const orgSlug = useActiveOrgSlug()
+  return [
+    {
+      title: "Home",
+      url: orgSlug ? `/${orgSlug}/home` : "/",
+      icon: <Home />,
+      items: [],
+    },
+  ]
+}
 
 /**
  * Pinned "Settings" shortcut rendered at the bottom of the scrollable
@@ -69,6 +75,7 @@ export function AppSidebar({
 }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
   const inSettings = isSettingsPath(pathname)
+  const dashboardNav = useDashboardNav()
 
   return (
     <Sidebar collapsible="icon" {...props}>

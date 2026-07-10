@@ -2,20 +2,6 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 import { auth } from "@workspace/auth"
 
-// Session type extended with activeOrganizationId from the organization plugin.
-// The plugin adds this field to the session at runtime; the base Session type
-// from better-auth does not include it, so we need to extend it here.
-type SessionWithOrg = {
-  activeOrganizationId?: string | null | undefined
-  [key: string]: unknown
-}
-
-const PROTECTED_PREFIXES = [
-  "/home",
-  "/settings",
-  "/onboarding",
-  "/accept-invitation",
-]
 const AUTH_PREFIXES = [
   "/login",
   "/signup",
@@ -24,13 +10,23 @@ const AUTH_PREFIXES = [
   "/verify-email",
 ]
 
+// Match /:org_slug/home and /:org_slug/settings (with optional nested path).
+// The :org_slug is a single path segment.
+const ORG_SCOPED_PROTECTED_RE = /^\/[^/]+\/(home|settings)(\/|$)/
+
 export const config = {
-  // Single matcher covering both directions of the auth gate.
   matcher: [
+    // Personal (user-scoped) routes.
     "/home/:path*",
     "/settings/:path*",
     "/onboarding",
     "/accept-invitation",
+    // Org-scoped routes (restrictive — explicit per §6 decision 1).
+    // Matches /:org_slug/home/... and /:org_slug/settings/... where
+    // :org_slug is any non-empty path segment.
+    "/:org_slug/home/:path*",
+    "/:org_slug/settings/:path*",
+    // Auth pages.
     "/login",
     "/signup",
     "/forgot-password",
@@ -39,22 +35,37 @@ export const config = {
   ],
 }
 
+/**
+ * Auth gate. Two questions and only two:
+ *   1. Unauthenticated hitting a protected page → /login?redirect=…
+ *   2. Authenticated sitting on an auth page (login/signup/etc.) → /
+ *
+ * The /verify-email page is the only auth page an authenticated user is
+ * allowed to see — they may have just landed there from the email link
+ * before the redirect chain settles. The root "/" is then the dispatcher
+ * (apps/app/app/page.tsx) that routes to /${activeOrgSlug}/home or
+ * /onboarding depending on session state.
+ *
+ * Anything beyond these two questions (e.g. "is the email verified?",
+ * "do they have an org?") is application state, not auth, and lives in the
+ * page that needs it.
+ */
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname
-  const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))
+  const isProtected =
+    pathname.startsWith("/home") ||
+    pathname.startsWith("/settings") ||
+    pathname === "/onboarding" ||
+    pathname === "/accept-invitation" ||
+    ORG_SCOPED_PROTECTED_RE.test(pathname)
   const isAuthPage = AUTH_PREFIXES.some(
     (p) => pathname === p || pathname.startsWith(`${p}/`),
   )
 
-  // Only call getSession when the route actually needs the gate decision.
-  // Avoids a DB roundtrip on every static asset or unrelated request.
-  if (!isProtected && !isAuthPage) {
-    return NextResponse.next()
-  }
+  // Skip the DB roundtrip on routes that don't need a session decision.
+  if (!isProtected && !isAuthPage) return NextResponse.next()
 
-  const session = await auth.api.getSession({
-    headers: request.headers,
-  })
+  const session = await auth.api.getSession({ headers: request.headers })
 
   if (isProtected && !session?.session) {
     const loginUrl = new URL("/login", request.url)
@@ -62,20 +73,11 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  // After signup, databaseHooks auto-create an org and set activeOrganizationId.
-  // Legacy sessions (pre-migration) have null — bounce them to /onboarding.
-  // /accept-invitation is excluded: an invited user without an org must reach it.
-  if (
-    session?.session &&
-    !(session.session as unknown as SessionWithOrg).activeOrganizationId &&
-    pathname !== "/accept-invitation" &&
-    !pathname.startsWith("/accept-invitation/")
-  ) {
-    return NextResponse.redirect(new URL("/onboarding", request.url))
-  }
-
-  if (isAuthPage && session?.session) {
-    return NextResponse.redirect(new URL("/home", request.url))
+  if (isAuthPage && session?.session && pathname !== "/verify-email") {
+    // Bounce to "/" — the dispatcher routes to the right org-scoped route.
+    // The proxy itself does not know the active org slug (would require a
+    // DB call per request) so the dispatcher is the right place.
+    return NextResponse.redirect(new URL("/", request.url))
   }
 
   return NextResponse.next()

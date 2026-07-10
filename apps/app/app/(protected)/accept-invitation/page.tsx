@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { BuildingIcon, MailIcon, UserIcon } from "lucide-react"
 import { auth } from "@workspace/auth"
 import { getSession } from "@/lib/session"
+import { getActiveOrgSlug } from "@/lib/active-org"
 import { Button } from "@workspace/ui/components/button"
 import { AcceptInvitationActions } from "@/components/invitations/accept-invitation-actions"
 
@@ -115,7 +116,12 @@ export default async function AcceptInvitationPage({ searchParams }: PageProps) 
 
   // Already accepted?
   if (invitation.status && invitation.status !== "pending") {
-    redirect("/home")
+    const activeOrgSlug = await getActiveOrgSlug()
+    if (activeOrgSlug) {
+      redirect(`/${activeOrgSlug}/home`)
+    } else {
+      redirect("/")
+    }
   }
 
   const orgName = invitation.organization?.name ?? "this organization"

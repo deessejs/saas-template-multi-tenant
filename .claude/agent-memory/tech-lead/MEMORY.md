@@ -18,3 +18,4 @@
 - [Claude Code workflows](claude-code/workflows.md) — Workflow tool primitives, patterns, hard limits, when over Agent tool
 - [User research style](user.md) — thorough research with examples, French, casual, autonomous decisions, /goal do it, fresh CLI
 - [Long-term solutions](feedback-long-term-solutions.md) — prefer systemic fixes over local patches (pnpm.overrides over catalog pin, codify patterns, track adjacent debt)
+- [Build workspace packages](feedback-builds.md) — after editing packages/*/src, run `pnpm --filter @workspace/X build`; consumers (apps/app) load dist/, not src/

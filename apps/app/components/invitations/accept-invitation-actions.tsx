@@ -5,18 +5,19 @@
  *
  * Wires `authClient.organization.acceptInvitation` / `rejectInvitation`.
  *
- * On accept: the server's `afterAcceptInvitation` hook (per `org.md`) sets the
- * invited org as active. Combined with the bug #9710 workaround in
- * `apps/app/lib/auth-client.ts`, `useActiveOrganization()` refetches correctly.
- * If the workaround regresses upstream, fall back to `window.location.href = "/home"`.
+ * On accept: the server's `afterAcceptInvitation` hook (per `org.md`) sets
+ * the invited org as active. The `acceptInvitation` path matches the
+ * organization plugin's atomListeners, so `useActiveOrganization()`
+ * refetches correctly without a hard reload.
  *
- * The `authClient.organization` namespace is not in better-auth's `ReactAuthClient`
- * type — same TS2883 situation as `org-switcher.tsx`. Cast through `unknown`.
+ * The `authClient.organization` namespace is not in better-auth's
+ * `ReactAuthClient` type — same TS2883 situation as `org-switcher.tsx`.
+ * Cast through `unknown`.
  */
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { authClient } from "@/lib/auth-client"
+import { authClient, useActiveOrganization } from "@/lib/auth-client"
 import { Button } from "@workspace/ui/components/button"
 
 interface AcceptInvitationActionsProps {
@@ -40,6 +41,11 @@ export function AcceptInvitationActions({
   const [accepting, setAccepting] = useState(false)
   const [declining, setDeclining] = useState(false)
 
+  // Hooks must be called at the top of the component. Read the active
+  // org's slug once and use it in the event handlers below.
+  const { data: activeOrg } = useActiveOrganization()
+  const activeOrgSlug = (activeOrg as { slug?: string } | null | undefined)?.slug ?? null
+
   async function handleAccept() {
     if (accepting) return
     setAccepting(true)
@@ -52,12 +58,14 @@ export function AcceptInvitationActions({
       return
     }
     toast.success("Invitation accepted")
-    // Hard reload — the active-org signal workaround should refetch on the
-    // session-signal change, but a full reload guarantees a clean state.
-    if (typeof window !== "undefined") {
-      window.location.href = "/home"
+    // `afterAcceptInvitation` in packages/auth/src/auth.ts sets the accepted
+    // org as active. Navigate to /:slug/home, or fall back to the
+    // dispatcher at "/" if the slug isn't loaded yet.
+    router.refresh()
+    if (activeOrgSlug) {
+      router.push(`/${activeOrgSlug}/home`)
     } else {
-      router.push("/home")
+      router.push("/")
     }
   }
 
@@ -73,7 +81,12 @@ export function AcceptInvitationActions({
       return
     }
     toast.success("Invitation declined")
-    router.push("/home")
+    // User still has their existing active org (decline doesn't touch it).
+    if (activeOrgSlug) {
+      router.push(`/${activeOrgSlug}/home`)
+    } else {
+      router.push("/")
+    }
   }
 
   return (
