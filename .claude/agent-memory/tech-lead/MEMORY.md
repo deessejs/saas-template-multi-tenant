@@ -4,7 +4,8 @@
 - [Vercel platform](project/vercel-platform.md) — July 2026 snapshot: Vercel Services (multi-framework), Fluid compute + Active CPU, Sandbox, AI Gateway, full product catalog
 - [Eve integration](project/eve.md) — `npx eve init` side effects on root pnpm-workspace.yaml + package.json + MiniMax M3 provider
 - [AGENTS + commit conventions](project/agents.md) — AGENTS.md markers + Conventional Commits (informal) + CODEOWNERS + Co-authored-by footer
-- [apps/app architecture](apps/app.md) — authenticated app (login/signup/dashboard/settings), separate deploy from web
+- [apps/app architecture](apps/app.md) — authenticated app with org-scoped [org_slug] routes, dispatcher, proxy.ts, accept-invitation, onboarding (multi-org since 2026-07-13); separate deploy from web
+- [apps/app session memoization debunked](apps/app-session-memoization-debunked.md) — do NOT use React.cache() on getSession(); violates Next.js 16 dynamic data rules; calls are sequential not parallel; cookieCache bug (#7008) is the real risk to watch
 - [apps/web architecture](apps/web.md) — public static site (marketing/blog/changelog/legal), NO auth, links to /login /signup live in apps/app
 - [apps/docs architecture](apps/docs.md) — Fumadocs-based docs site (separate deploy, target of /docs links from web/app)
 - [packages/ui audit](packages/ui-audit.md) — audit findings corrected after web verification (4 wrong, 4 right)
@@ -19,3 +20,5 @@
 - [User research style](user.md) — thorough research with examples, French, casual, autonomous decisions, /goal do it, fresh CLI
 - [Long-term solutions](feedback-long-term-solutions.md) — prefer systemic fixes over local patches (pnpm.overrides over catalog pin, codify patterns, track adjacent debt)
 - [Build workspace packages](feedback-builds.md) — after editing packages/*/src, run `pnpm --filter @workspace/X build`; consumers (apps/app) load dist/, not src/
+- [Audit 2026-07-10 apps/app fiches](project/audit-apps-app-fiches.md) — #02 and #04 intentionally absent from `temp/audit/2026-07-10-apps-app/problems/`; references in #03/#12 are historical
+- [Scope discipline](feedback-scope-discipline.md) — stay strictly within active fiches; don't suggest cleanups/alternatives not in the source material

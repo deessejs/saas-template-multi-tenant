@@ -1,19 +1,6 @@
-import { SettingsCard } from "@/components/settings"
-import { PasswordForm } from "@/components/settings/password-form"
+import { redirect } from "next/navigation"
 
-export default function PasswordPage() {
-  return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-bold">Change password</h1>
-        <p className="text-sm text-muted-foreground">
-          Update your account password.
-        </p>
-      </div>
-
-      <SettingsCard>
-        <PasswordForm />
-      </SettingsCard>
-    </div>
-  )
+// Legacy alias. See temp/audit/2026-07-13-apps-app-organizations-new/problems/03-rename-personal-settings-to-account.md.
+export default function SettingsPasswordLegacyRedirect() {
+	redirect("/account/settings/security/password")
 }

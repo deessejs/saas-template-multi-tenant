@@ -1,16 +1,6 @@
-import { DeleteAccountDialog } from "@/components/settings/delete-account-dialog"
+import { redirect } from "next/navigation"
 
-export default function DeleteAccountPage() {
-  return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-bold">Delete account</h1>
-        <p className="text-sm text-muted-foreground">
-          Permanently remove your account and all associated data.
-        </p>
-      </div>
-
-      <DeleteAccountDialog />
-    </div>
-  )
+// Legacy alias. See temp/audit/2026-07-13-apps-app-organizations-new/problems/03-rename-personal-settings-to-account.md.
+export default function SettingsDeleteLegacyRedirect() {
+	redirect("/account/settings/account/delete")
 }

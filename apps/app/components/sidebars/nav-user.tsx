@@ -104,7 +104,7 @@ export function NavUser() {
 	}
 
 	const menuItems = buildUserMenuItems({
-		accountHref: "/settings/account",
+		accountHref: "/account/settings/account",
 		handleLogout,
 	})
 

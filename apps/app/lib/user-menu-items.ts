@@ -35,7 +35,7 @@ export type UserMenuItem =
 export interface UserMenuItemsOptions {
   /** Called when the user picks "Log out". The menu disables itself while this is in-flight. */
   handleLogout: () => void
-  /** Target for the Account link. Typically `/settings/account`. */
+  /** Target for the Account link. Since the 2026-07-13 rename, the canonical personal-account destination is `/account/settings/account`. */
   accountHref: string
 }
 

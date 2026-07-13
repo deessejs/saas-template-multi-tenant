@@ -1,22 +1,6 @@
-import { SettingsCard } from "@/components/settings"
-import { ConnectedAccountsList } from "@/components/settings/connected-accounts-list"
+import { redirect } from "next/navigation"
 
-export default function ConnectionsPage() {
-  return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-bold">Connections</h1>
-        <p className="text-sm text-muted-foreground">
-          Manage your linked social accounts.
-        </p>
-      </div>
-
-      <SettingsCard
-        title="Linked accounts"
-        description="Connect your social accounts for easier sign-in."
-      >
-        <ConnectedAccountsList />
-      </SettingsCard>
-    </div>
-  )
+// Legacy alias. See temp/audit/2026-07-13-apps-app-organizations-new/problems/03-rename-personal-settings-to-account.md.
+export default function SettingsConnectionsLegacyRedirect() {
+	redirect("/account/settings/connections")
 }

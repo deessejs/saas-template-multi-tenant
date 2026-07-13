@@ -32,7 +32,18 @@ Flow: `/signup → /onboarding → authClient.organization.create({ name, slug }
 
 The `slug` is required by better-auth's endpoint (`crud-org.mjs:14` — `slug: z.string().min(1)`) and is **not** derived server-side. Derivation lives in `apps/app/lib/slug.ts` (`deriveSlug(name)`), with collision detection via `authClient.organization.checkOrganizationSlug` and retry on race conditions. See `temp/reports/auth/2026-07-10-organization-create-requires-slug-400.md` for the full design.
 
-The proxy guard at `apps/app/proxy.ts:68-75` redirects any signed-in user without `activeOrganizationId` (excluding `/accept-invitation`) to `/onboarding`. The routing is already in place; only the page itself is required.
+**Two distinct routes, two distinct contexts** (since the 2026-07-13 multi-org UX fix; see `temp/audit/2026-07-13-apps-app-organizations-new/`):
+
+- `/onboarding` — the **first-time setup wizard** for users with no organizations yet. The page itself gates: if the user already has orgs, it redirects them to their first org home so the wizard isn't shown to returning users.
+- `/organizations/new` — the **additional-organization creation page** for users who already belong to one or more orgs. Reached via the OrgSwitcher's "Create new organization" entry point. No first-org gating (the user already has at least one org).
+
+The root dispatcher (`apps/app/app/page.tsx`) routes verified users as follows:
+
+- Has active org in cookie → `/${activeOrgSlug}/home`
+- No active org + has orgs → `/${firstOrg.slug}/home` (OrgLayout aligns the cookie via `setActiveOrganization`)
+- No orgs at all → `/onboarding`
+
+`/organizations/new` is **not** a dispatcher destination — it's only reachable from the OrgSwitcher.
 
 **Why we don't auto-create server-side anymore:** the previous approach (`databaseHooks.session.create.before` calling `auth.api.createOrganization`) bypassed the client-side atom invalidation entirely, since the mutation never went through a better-auth client call. PRs [#9736](https://github.com/better-auth/better-auth/pull/9736) and [#9737](https://github.com/better-auth/better-auth/pull/9737) on the better-auth side would have fixed the invalidation; instead, we removed the auto-create and made the org creation a normal client-driven action.
 

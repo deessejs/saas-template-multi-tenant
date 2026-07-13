@@ -3,11 +3,11 @@ import type { NextRequest } from "next/server"
 import { auth } from "@workspace/auth"
 
 const AUTH_PREFIXES = [
-  "/login",
-  "/signup",
-  "/forgot-password",
-  "/reset-password",
-  "/verify-email",
+	"/login",
+	"/signup",
+	"/forgot-password",
+	"/reset-password",
+	"/verify-email",
 ]
 
 // Match /:org_slug/home and /:org_slug/settings (with optional nested path).
@@ -15,24 +15,30 @@ const AUTH_PREFIXES = [
 const ORG_SCOPED_PROTECTED_RE = /^\/[^/]+\/(home|settings)(\/|$)/
 
 export const config = {
-  matcher: [
-    // Personal (user-scoped) routes.
-    "/home/:path*",
-    "/settings/:path*",
-    "/onboarding",
-    "/accept-invitation",
-    // Org-scoped routes (restrictive — explicit per §6 decision 1).
-    // Matches /:org_slug/home/... and /:org_slug/settings/... where
-    // :org_slug is any non-empty path segment.
-    "/:org_slug/home/:path*",
-    "/:org_slug/settings/:path*",
-    // Auth pages.
-    "/login",
-    "/signup",
-    "/forgot-password",
-    "/reset-password",
-    "/verify-email",
-  ],
+	matcher: [
+		// Personal (user-scoped) routes. Since the 2026-07-13 rename, the
+		// personal namespace lives under /account/settings/*.
+		"/account/settings/:path*",
+		// Legacy personal routes under /settings/* — kept in the matcher so
+		// the redirect files can run; they all 307 to /account/settings/*.
+		"/settings/:path*",
+		// Personal non-settings routes.
+		"/home/:path*",
+		"/onboarding",
+		"/accept-invitation",
+		"/organizations/new",
+		// Org-scoped routes (restrictive — explicit per §6 decision 1).
+		// Matches /:org_slug/home/... and /:org_slug/settings/... where
+		// :org_slug is any non-empty path segment.
+		"/:org_slug/home/:path*",
+		"/:org_slug/settings/:path*",
+		// Auth pages.
+		"/login",
+		"/signup",
+		"/forgot-password",
+		"/reset-password",
+		"/verify-email",
+	],
 }
 
 /**
@@ -51,34 +57,38 @@ export const config = {
  * page that needs it.
  */
 export async function proxy(request: NextRequest) {
-  const pathname = request.nextUrl.pathname
-  const isProtected =
-    pathname.startsWith("/home") ||
-    pathname.startsWith("/settings") ||
-    pathname === "/onboarding" ||
-    pathname === "/accept-invitation" ||
-    ORG_SCOPED_PROTECTED_RE.test(pathname)
-  const isAuthPage = AUTH_PREFIXES.some(
-    (p) => pathname === p || pathname.startsWith(`${p}/`),
-  )
+	const pathname = request.nextUrl.pathname
+	const isProtected =
+		pathname.startsWith("/account/settings") ||
+		pathname === "/account/settings" ||
+		pathname.startsWith("/settings") ||
+		pathname === "/settings" ||
+		pathname.startsWith("/home") ||
+		pathname === "/onboarding" ||
+		pathname === "/accept-invitation" ||
+		pathname === "/organizations/new" ||
+		ORG_SCOPED_PROTECTED_RE.test(pathname)
+	const isAuthPage = AUTH_PREFIXES.some(
+		(p) => pathname === p || pathname.startsWith(`${p}/`),
+	)
 
-  // Skip the DB roundtrip on routes that don't need a session decision.
-  if (!isProtected && !isAuthPage) return NextResponse.next()
+	// Skip the DB roundtrip on routes that don't need a session decision.
+	if (!isProtected && !isAuthPage) return NextResponse.next()
 
-  const session = await auth.api.getSession({ headers: request.headers })
+	const session = await auth.api.getSession({ headers: request.headers })
 
-  if (isProtected && !session?.session) {
-    const loginUrl = new URL("/login", request.url)
-    loginUrl.searchParams.set("redirect", pathname)
-    return NextResponse.redirect(loginUrl)
-  }
+	if (isProtected && !session?.session) {
+		const loginUrl = new URL("/login", request.url)
+		loginUrl.searchParams.set("redirect", pathname)
+		return NextResponse.redirect(loginUrl)
+	}
 
-  if (isAuthPage && session?.session && pathname !== "/verify-email") {
-    // Bounce to "/" — the dispatcher routes to the right org-scoped route.
-    // The proxy itself does not know the active org slug (would require a
-    // DB call per request) so the dispatcher is the right place.
-    return NextResponse.redirect(new URL("/", request.url))
-  }
+	if (isAuthPage && session?.session && pathname !== "/verify-email") {
+		// Bounce to "/" — the dispatcher routes to the right org-scoped route.
+		// The proxy itself does not know the active org slug (would require a
+		// DB call per request) so the dispatcher is the right place.
+		return NextResponse.redirect(new URL("/", request.url))
+	}
 
-  return NextResponse.next()
+	return NextResponse.next()
 }

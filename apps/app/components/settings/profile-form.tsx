@@ -14,7 +14,7 @@ import { profileSchema } from "@/components/settings/schemas"
  * Profile edit form. Wires `authClient.updateUser({ name })`.
  *
  * Email is intentionally not editable here — better-auth requires a separate
- * verification flow (`changeEmail`) routed via `/settings/account/email`.
+ * verification flow (`changeEmail`) routed via `/account/settings/account/email`.
  *
  * Uses the project-local `Field` wrapper for label + error rendering (F1.6).
  */
@@ -94,7 +94,7 @@ export function ProfileForm() {
 				<p className="text-xs text-muted-foreground">
 					Email changes require verification.{" "}
 					<Link
-						href="/settings/account/email"
+						href="/account/settings/account/email"
 						className="text-primary hover:underline"
 					>
 						Change email

@@ -12,7 +12,10 @@ export const APP_CONFIG = {
     home: "/",
     login: "/login",
     signup: "/signup",
-    settings: "/settings",
+    // Personal account settings. Renamed from `/settings` to `/account/settings`
+    // on 2026-07-13 to make the personal-vs-org-scoped distinction explicit in
+    // the URL. See temp/audit/2026-07-13-apps-app-organizations-new/problems/03.
+    settings: "/account/settings",
   },
 } as const
 
