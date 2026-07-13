@@ -6,6 +6,7 @@ import { getSession } from "@/lib/session"
 import { getActiveOrgSlug } from "@/lib/active-org"
 import { Button } from "@workspace/ui/components/button"
 import { AcceptInvitationActions } from "@/components/invitations/accept-invitation-actions"
+import { SignOutButton } from "@/components/invitations/sign-out-button"
 
 type SearchParamsInput = { id?: string | undefined }
 type PageProps = { searchParams: Promise<SearchParamsInput> }
@@ -110,6 +111,11 @@ export default async function AcceptInvitationPage({ searchParams }: PageProps) 
         title="Wrong account"
         description={`This invitation is for ${invitation.email}. Sign out and sign in with that address to accept.`}
         Icon={MailIcon}
+        action={
+          <SignOutButton
+            redirectTo={`/login?redirect=/accept-invitation?id=${encodeURIComponent(id)}`}
+          />
+        }
       />
     )
   }
@@ -166,10 +172,12 @@ function StatusPanel({
   title,
   description,
   Icon = MailIcon,
+  action,
 }: {
   title: string
   description: string
   Icon?: React.ComponentType<{ className?: string }>
+  action?: React.ReactNode
 }) {
   return (
     <div className="mx-auto flex w-full max-w-md flex-col items-center gap-4 rounded-lg border p-6 text-center">
@@ -180,9 +188,11 @@ function StatusPanel({
         <h1 className="text-xl font-bold">{title}</h1>
         <p className="text-sm text-muted-foreground">{description}</p>
       </div>
-      <Button variant="outline" asChild>
-        <a href="/login">Go to login</a>
-      </Button>
+      {action ?? (
+        <Button variant="outline" asChild>
+          <a href="/login">Go to login</a>
+        </Button>
+      )}
     </div>
   )
 }

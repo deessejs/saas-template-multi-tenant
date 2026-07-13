@@ -68,18 +68,25 @@ export function LoginForm() {
 		defaultValues: {
 			email: "",
 			password: "",
+			remember: false,
 		},
 		validators: {
 			onSubmit: loginSchema,
 		},
 		onSubmit: async ({ value }) => {
+			// Map the form's `remember` field to better-auth's `rememberMe`
+			// parameter. The form keeps an abstract name; the SDK wire field
+			// is translated here so the schema stays decoupled from the
+			// better-auth API surface.
+			const { remember, ...rest } = value
 			// callbackURL="/" is passed in the body so better-auth returns
 			// Location: "/" on success — we rely on the JS client to follow
 			// that Location (which lands on the dispatcher). onSuccess is
 			// belt-and-suspenders in case the client does not follow redirects
 			// in-place for a verified user.
 			const { error } = await authClient.signIn.email({
-				...value,
+				...rest,
+				rememberMe: remember,
 				callbackURL: "/",
 			}, {
 				onSuccess: () => router.push("/"),
@@ -159,12 +166,21 @@ export function LoginForm() {
 					)}
 				/>
 
-				<div className="flex items-center gap-2">
-					<Checkbox id="remember" name="remember" />
-					<label htmlFor="remember" className="text-sm font-normal">
-						Remember me
-					</label>
-				</div>
+				<form.Field
+					name="remember"
+					children={(field) => (
+						<div className="flex items-center gap-2">
+							<Checkbox
+								id={field.name}
+								checked={field.state.value ?? false}
+								onCheckedChange={(checked) => field.handleChange(checked === true)}
+							/>
+							<label htmlFor={field.name} className="text-sm font-normal">
+								Remember me
+							</label>
+						</div>
+					)}
+				/>
 
 				<form.Subscribe
 					selector={(state) => [state.canSubmit, state.isSubmitting] as const}
