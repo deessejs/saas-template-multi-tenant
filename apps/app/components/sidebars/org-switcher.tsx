@@ -131,7 +131,7 @@ export function OrgSwitcher() {
             ))}
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild className="gap-2 p-2">
-              <Link href="/onboarding">
+              <Link href="/organizations/new">
                 <div className="flex size-6 shrink-0 items-center justify-center rounded-md border bg-transparent">
                   <PlusIcon className="size-4" />
                 </div>

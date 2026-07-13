@@ -1,17 +1,29 @@
 import { redirect } from "next/navigation"
 import { BuildingIcon } from "lucide-react"
 import { getSession } from "@/lib/session"
-import { getActiveOrgSlug } from "@/lib/active-org"
+import { listUserOrganizations } from "@/lib/active-org"
 import { CreateWorkspaceForm } from "@/components/onboarding"
 
-// State checks for /onboarding, on the page that needs them.
+// /onboarding — first-time setup wizard for users with NO organizations yet.
 //
-// `getSession()` (lib/session.ts) already returns the user with emailVerified,
-// so we read it from the user object. The active org's slug is resolved
-// server-side via `getActiveOrgSlug()` (lib/active-org.ts) so we can
-// redirect to the org-scoped /${activeOrgSlug}/home route.
+// Distinct from /organizations/new (which serves the additional-org case
+// for users who already belong to one or more orgs). See
+// temp/audit/2026-07-13-apps-app-organizations-new/.
+//
+// State checks:
+//   - Not signed in     → /login?redirect=/onboarding
+//   - Unverified email  → /verify-email
+//   - Already has orgs  → /${firstOrg.slug}/home (the wizard is irrelevant
+//                         for returning users; they should use
+//                         /organizations/new to add more, or hit their
+//                         existing home directly)
+//
+// The form invokes `authClient.organization.create` on submit, which
+// correctly invalidates both `$activeOrgSignal` and `$sessionSignal`
+// (per apps/app/lib/auth-client.ts:6-15), avoiding better-auth #9710's
+// stale-atom bug.
 export default async function OnboardingPage() {
-  const session = await getSession()
+	const session = await getSession()
 	if (!session?.user) {
 		redirect("/login?redirect=/onboarding")
 	}
@@ -21,12 +33,15 @@ export default async function OnboardingPage() {
 		redirect("/verify-email")
 	}
 
-	const activeOrgSlug = await getActiveOrgSlug()
-
-	// Pre-existing org → send the user to their org-scoped home; the form
-	// below is irrelevant.
-	if (activeOrgSlug) {
-		redirect(`/${activeOrgSlug}/home`)
+	// Returning users belong here — the onboarding wizard is for first-org
+	// setup only. Send them to their first org's home so the OrgLayout can
+	// align the active-org cookie via setActiveOrganization. They can use
+	// the OrgSwitcher's "Create new organization" entry point (linking to
+	// /organizations/new) to add more.
+	const orgs = await listUserOrganizations()
+	const firstOrg = orgs[0]
+	if (firstOrg) {
+		redirect(`/${firstOrg.slug}/home`)
 	}
 
 	return (
@@ -40,8 +55,8 @@ export default async function OnboardingPage() {
 			<div className="flex flex-col gap-1 text-center">
 				<h1 className="text-2xl font-bold">Create your workspace</h1>
 				<p className="text-sm text-muted-foreground">
-					Set up a name for your team. You can invite people and change
-					details later.
+					Welcome — let&apos;s set up your first team. You can invite
+					people and change details later.
 				</p>
 			</div>
 
