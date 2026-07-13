@@ -29,6 +29,23 @@ type AuthApiWithOrg = {
 }
 const authApi = auth.api as unknown as AuthApiWithOrg
 
+/**
+ * List the organizations the current user is a member of.
+ *
+ * Returns an empty array if the user is not signed in. Used by:
+ *   - The dispatcher in `apps/app/app/page.tsx` to route between
+ *     `/onboarding` (no orgs), `/${slug}/home` (has orgs), etc.
+ *   - The `/onboarding` wizard to detect returning users.
+ *
+ * Prefer this over calling `auth.api.listOrganizations` directly so the
+ * TS surface cast and shape contract live in one place.
+ */
+export async function listUserOrganizations(): Promise<OrganizationSummary[]> {
+  const session = await getSession()
+  if (!session?.user) return []
+  return authApi.listOrganizations({ headers: await headers() })
+}
+
 export async function getActiveOrgSlug(): Promise<string | null> {
   const session = await getSession()
   if (!session?.user) return null
