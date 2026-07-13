@@ -5,11 +5,17 @@ import { Toaster as Sonner, type ToasterProps } from "sonner"
 import { CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon } from "lucide-react"
 
 const Toaster = ({ ...props }: ToasterProps) => {
+  // next-themes types `theme` as `string` but sonner's `ToasterProps["theme"]`
+  // is the narrow union `"system" | "dark" | "light"`. Narrow with an
+  // explicit cast. The fallback to "system" handles both undefined (no theme
+  // set yet) and any unknown string sonner doesn't recognize.
   const { theme = "system" } = useTheme()
+  const resolvedTheme: NonNullable<ToasterProps["theme"]> =
+    (theme ?? "system") as NonNullable<ToasterProps["theme"]>
 
   return (
     <Sonner
-      theme={theme as ToasterProps["theme"]}
+      theme={resolvedTheme}
       className="toaster group"
       icons={{
         success: (

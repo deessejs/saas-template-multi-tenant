@@ -14,7 +14,18 @@ import { serverEnv } from "@workspace/env/server"
 // Database instances
 let _sql: ReturnType<typeof postgres> | null = null
 let _testDb: ReturnType<typeof drizzle> | null = null
-let _pgMemDb: any = null
+// pg-mem adapter shape (avoid `any`):
+//   public.none(sql: string)             — apply DDL/DML
+//   public.all(sql: string)              — query and return rows
+// We're typing these loosely since pg-mem is untyped and we don't want a
+// full @types install just for tests.
+type PgMemDb = {
+	public: {
+		none: (sql: string) => void
+		all: (sql: string) => unknown[]
+	}
+} | null
+let _pgMemDb: PgMemDb = null
 
 // Initialize pg-mem for schema tests
 async function initPgMem() {
@@ -23,7 +34,7 @@ async function initPgMem() {
     const db = newDb()
 
     // Create schema from our tables
-    db.public.none(`
+    ;(db as unknown as { public: { none: (sql: string) => void } }).public.none(`
       CREATE TABLE "user" (
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
@@ -141,9 +152,16 @@ export const testDb = {
     if (_pgMemDb) {
       // Return pg-mem adapter (limited functionality)
       return {
-        execute: (strings: TemplateStringsArray, ...values: any[]) => {
+        execute: (
+          strings: TemplateStringsArray,
+          ...values: unknown[]
+        ): unknown[] => {
+          if (!_pgMemDb) throw new Error("No database connection")
           return _pgMemDb.public.all(
-            strings.reduce((acc, str, i) => acc + str + (values[i] ?? ""), ""),
+            strings.reduce(
+              (acc, str, i) => acc + str + (values[i] ?? ""),
+              "",
+            ),
           )
         },
         select: () => _pgMemDb.public,

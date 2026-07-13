@@ -10,7 +10,7 @@ export const listUsers = base
       offset: z.number().int().min(0).optional().default(0),
     }),
   )
-  .handler(async ({ input }) => {
+  .handler(async () => {
     // TODO: Implement with @workspace/database
     return [{ id: "1", name: "User", email: "user@example.com" }]
   })

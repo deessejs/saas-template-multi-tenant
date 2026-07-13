@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Menu, X } from "lucide-react"
+import { Menu } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 import { Sheet, SheetContent, SheetTrigger } from "@workspace/ui/components/sheet"
 import { APP_NAME } from "@workspace/ui/lib/config"

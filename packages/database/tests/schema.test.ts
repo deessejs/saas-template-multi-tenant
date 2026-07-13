@@ -1,5 +1,5 @@
 import { afterAll, describe, expect, it } from "vitest"
-import { testDb, cleanup } from "./setup.js"
+import { cleanup } from "./setup.js"
 import * as schema from "../src/schema/index.js"
 
 describe("database schema", () => {

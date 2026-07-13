@@ -11,25 +11,6 @@ const DEFAULT_CONSENT: CookieConsentData = {
   marketing: false,
 }
 
-interface PersistedState {
-  consent: CookieConsentData
-  hasDecided: boolean
-  version?: number
-}
-
-function loadStored(): PersistedState | null {
-  if (typeof window === "undefined") return null
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return null
-    const parsed = JSON.parse(raw) as PersistedState
-    if (parsed.version !== CONSENT_VERSION) return null
-    return parsed
-  } catch {
-    return null
-  }
-}
-
 export const useCookieConsentStore = create<import("../types").CookieConsentStore>()(
   persist(
     (set, get) => ({

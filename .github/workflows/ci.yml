@@ -65,6 +65,13 @@ jobs:
   test-unit:
     name: Test (Unit)
     runs-on: ubuntu-latest
+    # @workspace/env/server validates env at import time. BETTER_AUTH_SECRET
+    # is required (32+ chars). DATABASE_URL is intentionally NOT set here —
+    # it would activate @workspace/auth's "database operations" suite which
+    # requires a real Postgres. Tests that need a real DB live in
+    # `test-integration` below (with the postgres service).
+    env:
+      BETTER_AUTH_SECRET: ci-test-secret-which-is-long-enough-to-pass-the-32-char-validation
     steps:
       - uses: actions/checkout@v4
         with:
@@ -115,6 +122,12 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
+
+      # Build @workspace/env first so drizzle-kit can resolve its
+      # `@workspace/env/server` import — otherwise "Cannot find module
+      # @workspace/env/dist/server.js" aborts Generate migrations.
+      - name: Build env package
+        run: pnpm turbo build --filter=@workspace/env
 
       - name: Generate migrations
         run: pnpm db:generate

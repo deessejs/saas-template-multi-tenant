@@ -27,7 +27,7 @@ export default function TermsPage() {
       </P>
       <H2>Disclaimer</H2>
       <P>
-        The service is provided "as is" without warranties of any kind, either
+        The service is provided &ldquo;as is&rdquo; without warranties of any kind, either
         express or implied.
       </P>
       <H2>Contact</H2>
