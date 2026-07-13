@@ -70,8 +70,6 @@ jobs:
     # it would activate @workspace/auth's "database operations" suite which
     # requires a real Postgres. Tests that need a real DB live in
     # `test-integration` below (with the postgres service).
-    env:
-      BETTER_AUTH_SECRET: ci-test-secret-which-is-long-enough-to-pass-the-32-char-validation
     steps:
       - uses: actions/checkout@v4
         with:
@@ -84,7 +82,16 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm turbo test
+        env:
+          BETTER_AUTH_SECRET: ci-test-secret-which-is-long-enough-to-pass-the-32-char-validation
+
+      # `--force` bypasses turbo's cache so env-var changes (and any new
+      # test files) are picked up immediately. Env is exported inline for
+      # belt-and-suspenders propagation through turbo's subprocesses.
+      - name: Run unit tests
+        env:
+          BETTER_AUTH_SECRET: ci-test-secret-which-is-long-enough-to-pass-the-32-char-validation
+        run: BETTER_AUTH_SECRET=ci-test-secret-which-is-long-enough-to-pass-the-32-char-validation pnpm turbo test --force
 
   test-integration:
     name: Test (Integration)
