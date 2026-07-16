@@ -23,7 +23,7 @@ let _pglite: PGlite | null = null
  *
  * Pattern: call once in `beforeAll`, clean up in `afterAll` via `cleanup()`.
  */
-export async function setupTestDb(): Promise<Drizzle> {
+export const setupTestDb = async (): Promise<Drizzle> => {
   if (_testDb) return _testDb
   _pglite = new PGlite()
   _testDb = drizzle(_pglite, { schema })
@@ -36,7 +36,7 @@ export async function setupTestDb(): Promise<Drizzle> {
 }
 
 /** Close the PGlite instance. Idempotent. Safe to call from `afterAll`. */
-export async function cleanup(): Promise<void> {
+export const cleanup = async (): Promise<void> => {
   if (_pglite) {
     await _pglite.close()
     _pglite = null
