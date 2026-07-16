@@ -63,14 +63,19 @@ export function SessionsTable() {
 		loadSessions()
 	}, [loadSessions])
 
-	async function handleRevoke(id: string) {
-		setRevoking(id)
-		const { error } = await authClient.revokeSession({ token: id })
+	async function handleRevoke(token: string) {
+		setRevoking(token)
+		// better-auth's revokeSession endpoint requires the session token, not the
+		// row id. The Zod schema in `packages/better-auth/src/api/routes/session.ts`
+		// enforces `body.token`, and the handler does `findSession(token)` then
+		// `deleteSession(token)`. Passing the id silently no-ops.
+		// Refs: https://better-auth.com/docs/concepts/session-management
+		const { error } = await authClient.revokeSession({ token })
 
 		if (error) {
 			toast.error(error.message ?? "Failed to revoke session")
 		} else {
-			setSessions((prev) => prev.filter((s) => s.id !== id))
+			setSessions((prev) => prev.filter((s) => s.token !== token))
 		}
 		setRevoking(null)
 	}
@@ -146,8 +151,8 @@ export function SessionsTable() {
 							<Button
 								variant="ghost"
 								size="sm"
-								onClick={() => handleRevoke(session.id)}
-								disabled={revoking === session.id}
+								onClick={() => handleRevoke(session.token)}
+								disabled={revoking === session.token}
 							>
 								{revoking === session.id ? "Signing out…" : "Sign out"}
 							</Button>
