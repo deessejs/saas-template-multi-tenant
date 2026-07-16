@@ -9,5 +9,5 @@
     "isolatedDeclarations": false
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "vitest.config.ts", "drizzle.config.ts", "src/test-utils.ts", "tests/**/*"]
+  "exclude": ["node_modules", "dist", "vitest.config.ts", "drizzle.config.ts", "tests/**/*"]
 }
