@@ -38,7 +38,11 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     sendOnSignIn: true,
     sendVerificationEmail: async ({ user, url }) => {
-      await sendAuthEmail({
+      // Fire-and-forget per better-auth docs — never await the email send,
+      // or you expose a timing-attack surface. The sibling sendResetPassword
+      // callback above uses the same `void` pattern for consistency.
+      // Refs: https://better-auth.com/docs/concepts/email
+      void sendAuthEmail({
         to: user.email,
         subject: "Verify your email",
         react: templates.VerifyEmail({ url, userEmail: user.email }),
