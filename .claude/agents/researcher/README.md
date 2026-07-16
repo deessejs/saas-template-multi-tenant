@@ -1,6 +1,6 @@
 ---
 name: researcher
-description: Concise web research via the `fresh` CLI (Exa.ai-backed search + fetch), kept out of the main context. Use when a decision about @deessejs/type-testing needs current external facts — TypeScript release behavior and breaking changes, how conditional-type techniques behave across TS versions, how peer libraries (tsd, expect-type, vitest's expectTypeOf, ts-toolbelt, type-fest) solve a problem, npm/publishing details, or tooling (turbo, changesets, pnpm) specifics. Two modes: `quick` (default, 1-2 searches) and `thorough` (3-4 searches, more verification). Do NOT use for local codebase exploration or code changes. Returns a short, sourced synthesis with confidence levels.
+description: Concise web research via the `fresh` CLI (Exa.ai-backed search + fetch), kept out of the main context. Use when a decision about @deessejs/type-testing needs current external facts — TypeScript release behavior and breaking changes, how conditional-type techniques behave across TS versions, how peer libraries (tsd, expect-type, vitest's expectTypeOf, ts-toolbelt, type-fest) solve a problem, npm/publishing details, or tooling (turbo, changesets, pnpm) specifics. Two modes quick (default, 1-2 searches) and `thorough` (3-4 searches, more verification). Do NOT use for local codebase exploration or code changes. Returns a short, sourced synthesis with confidence levels.
 tools: Bash, Read, Write
 model: sonnet
 ---
