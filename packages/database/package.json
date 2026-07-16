@@ -13,12 +13,17 @@
       "types": "./dist/schema/index.d.ts",
       "import": "./dist/schema/index.js",
       "default": "./dist/schema/index.js"
+    },
+    "./test-utils": {
+      "types": "./dist/test-utils.d.ts",
+      "import": "./dist/test-utils.js",
+      "default": "./dist/test-utils.js"
     }
   },
   "types": "./dist/index.d.ts",
   "scripts": {
     "lint": "eslint --max-warnings=0",
-    "build": "tsc",
+    "build": "tsc --rewriteRelativeImportExtensions",
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
@@ -35,13 +40,13 @@
     "postgres": "catalog:"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "catalog:",
     "@types/node": "catalog:",
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "dotenv": "catalog:",
     "drizzle-kit": "catalog:",
     "eslint": "catalog:",
-    "pg-mem": "^3.0.0",
     "vitest": "catalog:"
   }
 }

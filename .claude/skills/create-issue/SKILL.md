@@ -1,6 +1,6 @@
 ---
 name: create-issue
-description: Create GitHub issues with labels, priority, and structured fields for the saas-template project. Use when asked to "create an issue", "file an issue", or "open an issue" for the project.
+description: Create GitHub issues with labels, priority, and structured fields for the saas-template-multi-tenant project. Use when asked to "create an issue", "file an issue", or "open an issue" for the project.
 ---
 
 # `create-issue` Skill
@@ -30,11 +30,13 @@ Before creating, confirm:
 
 If the user only provides a title, use reasonable defaults: no priority label / `priority:medium`.
 
-## Repo context — `deessejs/saas-template`
+## Repo context — `deessejs/saas-template-multi-tenant`
 
 ### Org — `deessejs`
 
-Repo: `github.com/deessejs/saas-template`
+Repo: `github.com/deessejs/saas-template-multi-tenant`
+
+> ⚠️ **Dual-repo gotcha.** `deessejs/saas-template` is a *different*, older repo in the same org — **not** a typo or shorthand. Local directory `saas-template-multi-tenant` corresponds to `deessejs/saas-template-multi-tenant`. Always confirm via `git -C <workspace_root> remote -v` before any `gh --repo` invocation (see [[feedback-verify-gh-repo-target]] in tech-lead memory).
 
 ### Labels available in this repo
 
@@ -69,7 +71,7 @@ Labels are **repo-level** (set via `--label` in `gh issue create`). Do NOT creat
 - `github_actions` — Related to GitHub Actions
 
 **GitHub defaults (keep)**
-`bug`, `enhancement`, `documentation`, `duplicate`, `invalid`, `question`, `wontfix`, `good first issue`, `help wanted`
+`bug`, `enhancement`, `documentation`, `duplicate`, `invalid`, `question`, `wontfix`, `good first issue`, `help wanted`, `security`
 
 ### Issue templates
 

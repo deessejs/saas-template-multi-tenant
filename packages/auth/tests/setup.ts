@@ -3,19 +3,28 @@
  *
  * Provides test auth instance with testUtils plugin.
  * Import this in your tests instead of the production auth.
+ *
+ * The test database is shared via @workspace/database/test-utils (PGlite).
+ * No more ad-hoc postgres-js pool construction in this file.
  */
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "@better-auth/drizzle-adapter"
 import { testUtils } from "better-auth/plugins"
-import { drizzle } from "drizzle-orm/postgres-js"
-import postgres from "postgres"
+import { setupTestDb, cleanup, type Drizzle } from "@workspace/database/test-utils"
 import * as schema from "@workspace/database/schema"
 import { serverEnv } from "@workspace/env/server"
 import { sendAuthEmail, templates } from "@workspace/email"
+import { afterAll, beforeAll } from "vitest"
 
-// Test database connection
-const pool = postgres(serverEnv.TEST_DATABASE_URL, { max: 1 })
-const db = drizzle(pool)
+let db: Drizzle
+
+beforeAll(async () => {
+  db = await setupTestDb()
+})
+
+afterAll(async () => {
+  await cleanup()
+})
 
 // Test auth instance with testUtils
 export const auth = betterAuth({
@@ -38,7 +47,7 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
-      void sendAuthEmail({
+      await sendAuthEmail({
         to: user.email,
         subject: "Verify your email",
         react: templates.VerifyEmail({ url, userEmail: user.email }),

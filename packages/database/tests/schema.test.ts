@@ -1,54 +1,49 @@
-import { afterAll, describe, expect, it } from "vitest"
-import { cleanup } from "./setup.js"
+import { afterAll, beforeAll, describe, expect, it } from "vitest"
+import { sql } from "drizzle-orm"
 import * as schema from "../src/schema/index.js"
+import { setupTestDb, cleanup, type Drizzle } from "../src/test-utils.js"
+
+let db: Drizzle
+
+beforeAll(async () => {
+  db = await setupTestDb()
+})
+
+afterAll(async () => {
+  await cleanup()
+})
 
 describe("database schema", () => {
-  afterAll(async () => {
-    await cleanup()
-  })
-
-  describe("auth tables", () => {
-    it("should export user table", () => {
-      expect(schema.user).toBeDefined()
+  describe("table definitions", () => {
+    it("exports user with required columns", () => {
       expect(schema.user.id).toBeDefined()
       expect(schema.user.email).toBeDefined()
       expect(schema.user.name).toBeDefined()
+      expect(schema.user.emailVerified).toBeDefined()
     })
 
-    it("should export session table", () => {
-      expect(schema.session).toBeDefined()
+    it("exports session, account, verification", () => {
       expect(schema.session.id).toBeDefined()
       expect(schema.session.token).toBeDefined()
       expect(schema.session.userId).toBeDefined()
-    })
-
-    it("should export account table", () => {
-      expect(schema.account).toBeDefined()
       expect(schema.account.id).toBeDefined()
       expect(schema.account.providerId).toBeDefined()
-    })
-
-    it("should export verification table", () => {
-      expect(schema.verification).toBeDefined()
       expect(schema.verification.identifier).toBeDefined()
       expect(schema.verification.value).toBeDefined()
     })
+  })
 
-    it("should export relations", () => {
+  describe("relations", () => {
+    it("exports user/session/account relations", () => {
       expect(schema.userRelations).toBeDefined()
       expect(schema.sessionRelations).toBeDefined()
       expect(schema.accountRelations).toBeDefined()
     })
   })
 
-  describe("table structure", () => {
-    it("should have correct user table columns", () => {
-      // Verify table definition by checking column existence
-      const userTable = schema.user
-      expect(userTable).toBeDefined()
-
-      // Check that the table can be used in queries (structure validation)
-      // The actual query requires a running database
+  describe("runtime sanity (PGlite-backed)", () => {
+    it("runs a SELECT 1 against PGlite", async () => {
+      await expect(db.execute(sql`SELECT 1 as ok`)).resolves.toBeDefined()
     })
   })
 })

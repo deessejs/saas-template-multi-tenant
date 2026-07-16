@@ -3,6 +3,8 @@
 - [Vercel deploy](project/deploy.md) — eve vercel.json pattern + dashboard overrides + engines.node >=24 + live agent URL
 - [Next.js 16 proxy.ts](project/nextjs-proxy.md) — middleware renamed to proxy.ts; auth guard in apps/app/proxy.ts is correct
 - [Vercel platform](project/vercel-platform.md) — July 2026 snapshot: Vercel Services (multi-framework), Fluid compute + Active CPU, Sandbox, AI Gateway, full product catalog
+- [Vercel Fluid Compute pool](project/vercel-fluid-compute-pool.md) — post-2026-06 30-min functions: attachDatabasePool > SIGTERM for idle hygiene
+- [Repo labels aligned to skill](project/repo-labels-skill-aligned.md) — SKILL.md is canonical; pkg:* dropped, area:* + status:* + priority:* in use
 - [Eve integration](project/eve.md) — `npx eve init` side effects on root pnpm-workspace.yaml + package.json + MiniMax M3 provider
 - [AGENTS + commit conventions](project/agents.md) — AGENTS.md markers + Conventional Commits (informal) + CODEOWNERS + Co-authored-by footer
 - [apps/app architecture](apps/app.md) — authenticated app (login/signup/dashboard/settings), separate deploy from web
@@ -28,3 +30,5 @@
 - [Claude Code workflows](claude-code/workflows.md) — Workflow tool primitives, patterns, hard limits, when over Agent tool
 - [User research style](user.md) — thorough research with examples, French, casual, autonomous decisions, /goal do it, fresh CLI
 - [Long-term solutions](feedback-long-term-solutions.md) — prefer systemic fixes over local patches (pnpm.overrides over catalog pin, codify patterns, track adjacent debt)
+- [TS arrow style](feedback-ts-arrow-style.md) — user prefers `const foo = () => {}` over `function foo() {}` in TS code I generate
+- [Verify gh repo target](feedback-verify-gh-repo-target.md) — `git remote -v` before `gh --repo`; saas-template ≠ saas-template-multi-tenant
