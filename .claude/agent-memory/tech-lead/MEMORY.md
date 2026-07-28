@@ -12,15 +12,16 @@
 - [apps/docs architecture](apps/docs.md) — Fumadocs-based docs site (separate deploy, target of /docs links from web/app)
 - [packages/ui audit](packages/ui-audit.md) — audit findings corrected after web verification (4 wrong, 4 right)
 - [use-shadcn skill initiative](project/use-shadcn-skill.md) — 2026-07-09: 3-layer fix (skill + ESLint rule + new Checkbox) to stop agents using raw HTML; 3-file migration backlog
-- [packages/auth](packages/auth.md) — Better Auth schema ownership; runtime/adapter 1.6.23 vs legacy CLI 1.4.21 warning
-- [P1 useSecureCookies](project/p1-use-secure-cookies.md) — static `true` breaks local HTTP sessions
-- [P1 trustedOrigins](project/p1-trusted-origins.md) — localhost always trusted; conditional CSRF risk on deployment host
-- [P1 sendOnSignUp](project/p1-send-on-signup-disabled.md) — verification required but unenforced; f42933e temp bypass
+- [packages/auth](packages/auth.md) — Better Auth 1.6.23 workflow, generated-schema ownership, org plugin wired (issue #12) but tables not yet generated
+- [packages/api](packages/api.md) — oRPC + hono + zod API layer, separate from packages/auth; consumed by apps/app
+- [packages/cookies](packages/cookies.md) — zustand cookie-consent store + components, client-only, separate from packages/ui
+- [packages/utils](packages/utils.md) — generic framework-agnostic TS helpers, distinct from packages/ui (no React dep)
+- [oRPC API layer](project/orpc-api-layer.md) — apps/app uses oRPC over hono, not plain REST in apps/app/app/api
+- [trustedOrigins fix](project/trusted-origins-fix.md) — 2026-07-28: localhost entries ARE NODE_ENV-gated; P1 framing obsolete, only ALLOWED_ORIGINS deploy-config risk remains
 - [P1 CI typecheck](project/p1-ci-typecheck-scope.md) — typecheck job filters workspace and skips --frozen-lockfile
 - [P1 catalog latest tags](project/p1-catalog-latest-tags.md) — four `latest` entries defeat catalog reproducibility
 - [P1 settings stubs](project/p1-settings-cosmetic-stubs.md) — six setTimeout/DUMMY_* stubs in settings pages
 - [P1 OAuthButtons](project/p1-oauth-buttons-no-error.md) — duplicated OAuthButtons with no error handling
-- [Better Auth CLI blocker](project/better-auth-cli-release-blocker.md) — version mismatch blocks safe auth schema generation
 - [Verify high-severity findings](feedback-verify-high-severity-findings.md) — P0/P1 require exact versions, runtime/Git proof, and Fresh sources
 - [Package structure](project/package-structure.md) — one-package-per-concern — new features get their own packages/* (e.g. packages/email for the mailer)
 - [Mailer audit](project/mailer-audit.md) — 2026-07-07 decision log: Resend + console default + react-email in new packages/email package

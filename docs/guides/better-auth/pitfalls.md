@@ -2,6 +2,8 @@
 
 **Read this before any implementation.** These are behavioral bugs, non-obvious defaults, and removed features that have caused issues in this repo.
 
+> **Reading guide.** Sections marked `— ✅ Implemented` describe defects that were open at one point and are now closed in the codebase. They are kept as historical records so future contributors don't re-introduce the regression and so reviewers can spot the fix going backwards. Open risks (sections without the `Implemented` marker) still apply.
+
 ---
 
 ## 1. `autoCreateOrganizationOnSignUp` Does Not Exist
@@ -69,13 +71,11 @@ Until the upstream fix lands, this workaround is required for a correct UX.
 
 ---
 
-## 4. `advanced.useSecureCookies: true` Breaks Local Dev
+## 4. `advanced.useSecureCookies` Breaks Local Dev — ✅ Implemented
 
 Setting `useSecureCookies: true` forces the `Secure` cookie attribute in **all environments**, including `NODE_ENV=development`. Without HTTPS in local dev, cookies are silently rejected by the browser and sessions never work.
 
-**Current state in this repo:** this option is set. Local dev must use `http://localhost:3000` and the browser must not block cookies.
-
-**Fix:** either remove the line (cookies are secure by default in production anyway) or guard it:
+**State (2026-07-28):** `packages/auth/src/auth.ts:60-62` guards the option:
 
 ```ts
 advanced: {
@@ -83,15 +83,17 @@ advanced: {
 },
 ```
 
+Implemented. Local HTTP sessions on `localhost:3000` / `:3001` work without browser workarounds.
+
 **Source:** [better-auth.com/docs/concepts/cookies](https://better-auth.com/docs/concepts/cookies) — "cookies are secure only in production by default."
 
 ---
 
-## 5. `localhost` in `trustedOrigins` Risks Prod Leak
+## 5. `localhost` in `trustedOrigins` Risks Prod Leak — ✅ Implemented (deploy-config caveat remains)
 
-`trustedOrigins` currently includes hardcoded `http://localhost:3000` and `http://localhost:3001`. This is fine in development, but if `ALLOWED_ORIGINS` is empty in production, localhost origins are still trusted — a potential security issue.
+Including `http://localhost:3000` / `:3001` in `trustedOrigins` without a NODE_ENV gate is a security issue: an attacker who can reach localhost on the deployment host passes the CSRF check unconditionally.
 
-**Fix:** guard with `NODE_ENV`:
+**State (2026-07-28):** `packages/auth/src/auth.ts:13-18` is now NODE_ENV-gated:
 
 ```ts
 trustedOrigins: [
@@ -102,33 +104,49 @@ trustedOrigins: [
 ],
 ```
 
+Implemented. The code defect is closed.
+
+**Residual deploy-config risk (NOT a code defect):** `packages/env/src/schema.ts` defines `ALLOWED_ORIGINS` with `csv.default([])`. If a deployer forgets to set it in production, every origin is rejected and login breaks entirely (no CSRF, just blanket denial). Add `ALLOWED_ORIGINS` to the deploy checklist explicitly.
+
 **Source:** [better-auth.com/docs/reference/options](https://better-auth.com/docs/reference/options) — `trustedOrigins` config.
 
 ---
 
-## 6. `sendOnSignUp` Is Temporarily `false`
+## 6. `sendOnSignUp` Was Temporarily `false` — ✅ Implemented
 
-Email verification on signup is disabled as a temporary bypass (commit message: "disable email verification (temp bypass)"). The code has `sendOnSignUp: false`.
+Email verification on signup was disabled at one point as a temporary bypass (commit message: "disable email verification (temp bypass)"). The risk: while verification was required, no verification email was sent, leaving unverified users with session cookies that could mutate per-user state.
 
-**When reactivating:** set it to `true` explicitly. Do not rely on the `undefined` default, which depends on `requireEmailVerification` to trigger the send.
+**State (2026-07-28):** `packages/auth/src/auth.ts:38-53` sets both `sendOnSignUp: true` and `sendOnSignIn: true`. The fire-and-forget pattern (`void sendAuthEmail(...)`) is in place — see [`email.md`](./email.md). Implemented.
+
+**Do not re-disable.** If a future change needs to bypass verification, it should be gated on a feature flag with an explicit expiry — not silently flipped back to `false`.
 
 **Source:** [better-auth.com/docs/authentication/email-password](https://better-auth.com/docs/authentication/email-password) — `sendOnSignUp` options documented under email verification config.
 
 ---
 
-## 7. Auth Middleware Throws Plain `Error`, Not `ORPCError`
+## 7. Auth Middleware Should Throw `ORPCError`, Not Plain `Error` — ✅ Implemented (signature note)
 
-In `packages/api/src/router/middlewares/auth.ts`:
+Throwing `new Error("Authentication required")` from a oRPC middleware does not surface the correct HTTP status code — oRPC defaults to `500` for plain `Error`. The correct type is `ORPCError` from `@orpc/server`.
 
-```ts
-throw new Error("Authentication required")
-```
-
-oRPC's error handling may not map a plain `Error` to the correct HTTP status code. The correct throw should be:
+**State (2026-07-28):** `packages/api/src/router/middlewares/auth.ts` throws `ORPCError`:
 
 ```ts
 import { ORPCError } from "@orpc/server"
-throw new ORPCError({ code: "UNAUTHORIZED", message: "Authentication required" })
+import { base } from "../context.js"
+import type { AuthContext } from "../context.js"
+
+export const authMiddleware = base.middleware(async ({ context, next }) => {
+  if (!context.user || !context.session) {
+    throw new ORPCError("UNAUTHORIZED")
+  }
+  return next({
+    context: {
+      ...context,
+      user: context.user,
+      session: context.session,
+    } as AuthContext,
+  })
+})
 ```
 
-This is tracked as a minor issue since oRPC may still surface the message, but the status code may be wrong (500 instead of 401).
+Implemented. Status code is now `401` as expected. The string-code form (`new ORPCError("UNAUTHORIZED")`) is equivalent to `new ORPCError({ code: "UNAUTHORIZED" })`; the explicit `message` field is optional.

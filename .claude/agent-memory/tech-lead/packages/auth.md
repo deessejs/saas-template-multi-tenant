@@ -1,19 +1,23 @@
 ---
 name: packages-auth
-description: Better Auth package workflow, generated-schema ownership, and the 2026-07-13 CLI/runtime version mismatch that blocks safe schema generation
+description: Better Auth package workflow, generated-schema ownership, and the 2026-07-28 state of the Organization plugin (wired in code, schema not yet generated)
 metadata:
   type: reference
 ---
 
 # Better Auth Package Workflow
 
-## Current version warning (2026-07-13)
+## Versions (2026-07-28)
 
-The application runtime and standalone Drizzle adapter resolve to `1.6.23`, but the configured legacy `@better-auth/cli` resolves to `1.4.21`. Better Auth warns that the old CLI can behave incorrectly with runtime versions `>=1.5`; it renamed the supported CLI package to `auth`.
+`better-auth` and `@better-auth/drizzle-adapter` both resolve to `^1.6.23` from the workspace catalog. The `pnpm auth:generate` script uses `pnpm exec auth`, which resolves to the **local** install — also `1.6.23`. The earlier "CLI 1.4.21 vs runtime 1.6.23" mismatch is no longer present; do not re-flag it.
 
-Treat `pnpm auth:generate` as release-blocked until the CLI, runtime, and adapter follow one reviewed release line. Run the first aligned generation in an isolated worktree, generate to a temporary path, and review the diff before replacing `packages/database/src/schema/auth.ts`. The full evidence and acceptance criteria live in `temp/issues/P0-001-better-auth-cli-runtime-version-mismatch.md`.
+## Organization plugin — issue #12 in flight
 
-Related project state: [[better-auth-cli-release-blocker]].
+The `organization()` plugin is wired in `packages/auth/src/auth.ts:68-73` with `requireEmailVerificationOnInvitation: true`. **No auto-create on signup** (commit `73830a1` dropped it per `NO_ORG_RECOVERY.md`).
+
+The corresponding schema tables (`organization`, `member`, `invitation`, `team`, etc.) are **not yet in `packages/database/src/schema/auth.ts`** — that file still holds only the 4 base tables (`user`, `session`, `account`, `verification`). Until `pnpm auth:generate` runs against the updated config, `auth.api.*` calls that touch org state will fail at runtime.
+
+**Active branch:** `impl/12-feat-auth-wire-organization-plugin-with-auto-creat`. Spec lives in `docs/internal/specs/organizations/` (subdirs: access-control, crud, flows, invitations, members, onboarding, teams).
 
 ## Generate Auth Schema
 
@@ -32,7 +36,7 @@ In this monorepo, the intended entry point remains:
 pnpm --filter @workspace/auth auth:generate
 ```
 
-As of 2026-07-13, `packages/auth/package.json` still maps that script to the legacy `better-auth` executable from `@better-auth/cli@1.4.21`. Do not treat the command as safe until the dependency and executable are aligned with runtime `1.6.23` (or another single reviewed release line).
+As of 2026-07-28, `packages/auth/package.json` maps that script to the local `better-auth` binary (catalog `^1.6.23`). Generation is safe to run.
 
 The CLI searches for `auth.ts` in `./`, `./utils`, `./lib`, or `src/*` by default. Since our auth config is in `packages/auth/src/`, we must specify `--config` explicitly.
 
@@ -57,9 +61,7 @@ The CLI searches for `auth.ts` in `./`, `./utils`, `./lib`, or `src/*` by defaul
 | `packages/database/drizzle/*.sql` | drizzle-kit | ⚠️ only hand-write for off-tree changes |
 | `packages/database/drizzle/meta/_journal.json` | drizzle-kit | ❌ no (unless you know what you're doing) |
 
-## What the legacy generator does (verified in `@better-auth/cli@1.4.21` dist)
-
-This section records the old generator for historical diagnosis. Do not infer Better Auth 1.6.23 generator behavior from it; the version mismatch is the active release blocker.
+## What the generator emits (verified in `better-auth@1.6.23` dist)
 
 The legacy generator (`generators-Ht8QYIi_.mjs:133-140`) emits a Drizzle column with:
 
@@ -153,8 +155,9 @@ The current setup uses the second pattern in spirit but only one is wired in dri
 ### Tests
 
 - Runner: `vitest` (`pnpm test` / `pnpm test:run`)
-- Database: `pg-mem` (in-memory postgres) — no external DB needed for tests
-- Test utilities: `packages/database/src/test-utils.ts`
+- Database: **`@electric-sql/pglite`** — real Postgres in WASM, not `pg-mem`. The earlier pg-mem setup was a drift liability; PGlite reads the same `schema/index.ts` the prod runtime uses, so tests and prod share the schema source-of-truth.
+- Test utilities: `packages/database/src/test-utils.ts` — exposes `setupTestDb()`, `cleanup()`, typed `Drizzle` client. **Critical limitation:** PGlite has a single WASM connection — parallel transactions deadlock. Serialize `Promise.all([tx1, tx2])` calls in tests.
+- One `setupTestDb` per process. Sharing across Vitest workers requires one module instance per worker.
 
 ### Production vs dev — pick the right command
 
