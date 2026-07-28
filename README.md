@@ -6,7 +6,7 @@
   </picture>
 </p>
 
-<h1 align="center">SaaS Template — Multi-Tenant</h1>
+<h1 align="center">SaaS Template - Multi-Tenant</h1>
 
 <p align="center">
   <strong>Production-ready multi-tenant SaaS starter.</strong>
@@ -34,7 +34,7 @@
   </a>
 </p>
 
-> 👉 **Looking for the single-tenant version?** See [`deessejs/saas-template`](https://github.com/deessejs/saas-template) — the same monorepo architecture without the Organization plugin, for users who don't need workspaces.
+> 👉 **Looking for the single-tenant version?** See [`deessejs/saas-template`](https://github.com/deessejs/saas-template) - the same monorepo architecture without the Organization plugin, for users who don't need workspaces.
 
 ---
 
@@ -44,17 +44,17 @@
 |---|---|---|
 | **Multi-tenant by default** | Organization plugin wired in `@workspace/auth` with invite-only memberships. Tenants are created via `auth.api.createOrganization` or invitations, never auto-created on signup. | Real workspaces out of the box, without a single-tenant retrofit later. |
 | **Apps** | `apps/web` (marketing), `apps/app` (authenticated product), `apps/docs` (Fumadocs) | Three deployable surfaces, each with its own purpose and URL. |
-| **Auth** | `packages/auth` — Better Auth + Drizzle adapter, email verification, password reset, Organization plugin | Production gating in `apps/app/proxy.ts`, not a demo flow. |
-| **API** | `packages/api` — Hono + oRPC, end-to-end typed routes | Type-safe RPC without GraphQL schemas. |
-| **Database** | `packages/database` — Drizzle ORM + Postgres, PGlite-backed test runner (real Postgres in WASM) | Single source of truth for schema; tests run with zero infrastructure. |
-| **Email** | `packages/email` — React Email templates with a swappable transport (Console in dev, Resend in prod) | Transactional email that works locally and scales to prod without code changes. |
-| **Env** | `packages/env` — Zod-validated env, lazy validation, browser-bundle guard | One schema, no env drift, secrets stay server-side. |
-| **UI** | `packages/ui` — shadcn/ui + Tailwind v4, centralized design tokens | One component library, every app reuses it. |
+| **Auth** | `packages/auth` - Better Auth + Drizzle adapter, email verification, password reset, Organization plugin | Production gating in `apps/app/proxy.ts`, not a demo flow. |
+| **API** | `packages/api` - Hono + oRPC, end-to-end typed routes | Type-safe RPC without GraphQL schemas. |
+| **Database** | `packages/database` - Drizzle ORM + Postgres, PGlite-backed test runner (real Postgres in WASM) | Single source of truth for schema; tests run with zero infrastructure. |
+| **Email** | `packages/email` - React Email templates with a swappable transport (Console in dev, Resend in prod) | Transactional email that works locally and scales to prod without code changes. |
+| **Env** | `packages/env` - Zod-validated env, lazy validation, browser-bundle guard | One schema, no env drift, secrets stay server-side. |
+| **UI** | `packages/ui` - shadcn/ui + Tailwind v4, centralized design tokens | One component library, every app reuses it. |
 | **Tooling** | pnpm 11 workspaces, Turbo v2, strict catalogs, shared ESLint + TS configs | One command rebuilds, lints, types, tests the whole monorepo. |
 
 ## Why this template
 
-- **Multi-tenant by design.** The Organization plugin is wired and the schema is configured for tenants, invitations, and memberships — not bolted on after the fact.
+- **Multi-tenant by design.** The Organization plugin is wired and the schema is configured for tenants, invitations, and memberships - not bolted on after the fact.
 - **Modern, but boring where it matters.** Next.js 16, Tailwind v4, React 19, TypeScript 6. Chosen because they're the default for new SaaS projects today, not because they're novel.
 - **Lockfile-clean pnpm catalogs.** All shared versions live in `pnpm-workspace.yaml` with `catalogMode: strict`. No drift between apps.
 - **Real auth flow.** Email verification is enforced in the proxy. No "demo" auth.
@@ -93,7 +93,7 @@ pnpm db:push
 pnpm dev
 ```
 
-Each app's default port is in its own README under `apps/*/`. The dev proxy in `apps/app/proxy.ts` trusts `localhost:3000` and `localhost:3001` by default — see `packages/auth/src/auth.ts` for the exact matching.
+Each app's default port is in its own README under `apps/*/`. The dev proxy in `apps/app/proxy.ts` trusts `localhost:3000` and `localhost:3001` by default - see `packages/auth/src/auth.ts` for the exact matching.
 
 ## Available commands
 
@@ -106,7 +106,7 @@ Each app's default port is in its own README under `apps/*/`. The dev proxy in `
 | `pnpm test` | Run unit tests (PGlite, no DB or Docker needed) |
 | `pnpm db:generate` | Diff schema → write SQL migration |
 | `pnpm db:migrate` | Apply pending migrations |
-| `pnpm db:push` | Sync schema directly (dev only — never in prod) |
+| `pnpm db:push` | Sync schema directly (dev only - never in prod) |
 | `pnpm db:studio` | Open Drizzle Studio in the browser |
 | `pnpm auth:generate` | Regenerate Better Auth schema in `packages/database/src/schema/auth.ts` |
 | `pnpm env:check` | Validate that all required env vars are present |
@@ -167,13 +167,13 @@ Click the **Deploy with Vercel** button at the top. The monorepo is detected aut
 | `apps/docs` | `https://docs.yourdomain.com` |
 
 > [!WARNING]
-> `engines.node` is pinned to `"24.x"`. If your deploy target requires a different major, update `package.json` and `pnpm-workspace.yaml` together. Vercel re-detects on each change but can serve stale builds — see [`docs/guides/better-auth/pitfalls.md`](docs/guides/better-auth/pitfalls.md) for the gotchas around cookies and CSRF.
+> `engines.node` is pinned to `"24.x"`. If your deploy target requires a different major, update `package.json` and `pnpm-workspace.yaml` together. Vercel re-detects on each change but can serve stale builds - see [`docs/guides/better-auth/pitfalls.md`](docs/guides/better-auth/pitfalls.md) for the gotchas around cookies and CSRF.
 
 ## What's locked
 
 This template ships with decisions you can lean on without re-litigating:
 
-- **Multi-tenant is the default.** Org plugin is enabled in `packages/auth/src/auth.ts`. Memberships are invite-only — there is no auto-create on signup, so a forgotten user cannot end up in a workspace they never asked to join.
+- **Multi-tenant is the default.** Org plugin is enabled in `packages/auth/src/auth.ts`. Memberships are invite-only - there is no auto-create on signup, so a forgotten user cannot end up in a workspace they never asked to join.
 - **Email verification is enforced.** `apps/app/proxy.ts` redirects unverified sessions to `/verify-email`; `sendOnSignUp` and `sendOnSignIn` both fire.
 - **Auth config is a single source.** Every Better Auth option lives in `packages/auth/src/auth.ts`. Apps and components import from `@workspace/auth`; the config is never inlined.
 - **Schema is CLI-owned.** `packages/database/src/schema/auth.ts` is regenerated by `pnpm auth:generate`. Extend the domain with satellite tables (one-to-one keyed on `user.id`), not inline columns on the generated tables.
@@ -183,7 +183,7 @@ This template ships with decisions you can lean on without re-litigating:
 
 - **Proxy, not middleware.** Next.js 16 renamed `middleware.ts` to `proxy.ts`. The auth guard lives at `apps/app/proxy.ts`.
 - **Catalogs, not manual pins.** All shared versions are centralized in `pnpm-workspace.yaml` with `catalogMode: strict`.
-- **Per-package AGENTS.md invariants.** Each package under `packages/*` ships its own `AGENTS.md` (or `README.md`) with the invariants that apply to that package's code — read those before editing.
+- **Per-package AGENTS.md invariants.** Each package under `packages/*` ships its own `AGENTS.md` (or `README.md`) with the invariants that apply to that package's code - read those before editing.
 
 ## Contributing
 
