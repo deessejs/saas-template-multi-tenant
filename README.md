@@ -166,8 +166,8 @@ Click the **Deploy with Vercel** button at the top. The monorepo is detected aut
 | `apps/app` | `https://app.yourdomain.com` |
 | `apps/docs` | `https://docs.yourdomain.com` |
 
-> [!WARNING]
-> `engines.node` is pinned to `"24.x"`. If your deploy target requires a different major, update `package.json` and `pnpm-workspace.yaml` together. Vercel re-detects on each change but can serve stale builds - see [`docs/guides/better-auth/pitfalls.md`](docs/guides/better-auth/pitfalls.md) for the gotchas around cookies and CSRF.
+> [!NOTE]
+> `engines.node` is pinned to `"24.x"` in `package.json`. If your deploy target requires a different major, update it there.
 
 ## What's locked
 
