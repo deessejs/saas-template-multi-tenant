@@ -2,6 +2,24 @@
 
 Organization management with memberships, roles, and invitations. See [`index.md`](./index.md) first and read [`hooks.md`](./hooks.md) before this guide.
 
+> **⚠️ Stale sections — pending issue #12 (last touched 2026-07-28)**
+>
+> Several sections below describe code that **does not exist** in `packages/auth/src/auth.ts` today:
+>
+> | Section | Describes | Real state (2026-07-28) |
+> |---|---|---|
+> | §"Auto-Create Org on Signup" | `databaseHooks.session.create.before` + `slugify()` | **No `databaseHooks` configured.** Auto-create on signup is intentionally NOT implemented (commit `73830a1` + `NO_ORG_RECOVERY.md`). |
+> | §"Sending Invitations" + §"Invitation Email" | `sendInvitationEmail` callback hooked into plugin options | **No `sendInvitationEmail` configured.** Invitations will fail server-side email-send until wired. |
+> | §"afterAcceptInvitation — Set Active Org" | `organizationHooks.afterAcceptInvitation` calling `setActiveOrganization` | **No `organizationHooks` configured.** |
+> | §"Organization Lifecycle Hooks" | `organizationHooks.beforeCreateOrganization` / `afterCreateOrganization` / `beforeDeleteOrganization` | **No `organizationHooks` configured.** |
+> | §"Slug generation" | Standalone `slugify()` function (40 char max, URL-safe) | **Function lives in this guide only** — not exported from any package. |
+>
+> What IS configured today in `packages/auth/src/auth.ts`: just `organization({ requireEmailVerificationOnInvitation: true })` + `nextCookies()`. Nothing else. The schema (`packages/database/src/schema/auth.ts`) does not yet contain the `organization` / `member` / `invitation` / `team` tables.
+>
+> **Do not treat this guide as documentation of current behavior.** It is a design draft pending the work in branch `impl/12-feat-auth-wire-organization-plugin-with-auto-creat`. After #12 lands (or is split into smaller issues), this guide should be rewritten to match the implemented surface. Tracked in `docs/internal/specs/organizations/` (7 sub-specs).
+>
+> Sections that ARE accurate today: §"Roles" (better-auth built-ins, no project-specific overrides yet), §"Custom Roles" (reference design, not yet wired), §"Email Verification Requirement" (matches `requireEmailVerificationOnInvitation: true`), §"Membership Limits" and §"Restrict Org Creation" (option reference — not configured, will be when plans/billing land).
+
 **Source:** [better-auth.com/docs/plugins/organization](https://better-auth.com/docs/plugins/organization) — full plugin documentation.
 
 ---

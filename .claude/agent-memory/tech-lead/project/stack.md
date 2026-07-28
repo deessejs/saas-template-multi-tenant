@@ -32,7 +32,7 @@ shamefully-hoist=false
 public-hoist-pattern[]=
 ```
 
-**allowBuilds gotcha**: values MUST be the package name (or boolean `true`), not placeholder text. If `eve init` or a linter rewrites them, typecheck fails with `ERR_PNPM_IGNORED_BUILDS`. pnpm 11 requires explicit allowBuilds for packages with postinstall (esbuild, sharp).
+**allowBuilds gotcha**: values MUST be the package name (or boolean `true`), not placeholder text. If a linter rewrites them, typecheck fails with `ERR_PNPM_IGNORED_BUILDS`. pnpm 11 requires explicit allowBuilds for packages with postinstall (esbuild, sharp).
 
 ## Catalogs (centralized versions)
 
