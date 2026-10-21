@@ -1,5 +1,5 @@
 {
-  "name": "next-monorepo",
+  "name": "saas-template-multi-tenant",
   "version": "0.0.1",
   "private": true,
   "scripts": {
