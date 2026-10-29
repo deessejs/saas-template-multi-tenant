@@ -1,13 +1,22 @@
 import Image from "next/image"
 import Link from "next/link"
 import { Calendar, Clock } from "lucide-react"
-import { Card, CardDescription, CardHeader, CardTitle } from "@workspace/ui/components/card"
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@workspace/ui/components/card"
 import type { Post } from "@/lib/blog/types"
 import { TagList } from "./tag-list"
 
 export function PostCard({ post }: { post: Post }) {
   const hasCover = Boolean(post.cover)
-  const authors = post.authors?.length ? post.authors : post.author ? [post.author] : []
+  const authors = post.authors?.length
+    ? post.authors
+    : post.author
+      ? [post.author]
+      : []
 
   return (
     <Card className="group h-full overflow-hidden transition-colors hover:border-foreground/30 hover:bg-muted/30">
@@ -47,7 +56,7 @@ export function PostCard({ post }: { post: Post }) {
                   <Link
                     key={tag}
                     href={`/blog/tag/${encodeURIComponent(tag)}`}
-                    className="rounded-full border border-border/40 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider transition-colors hover:bg-foreground hover:text-background"
+                    className="rounded-full border border-border/40 px-2 py-0.5 text-[10px] font-medium tracking-wider uppercase transition-colors hover:bg-foreground hover:text-background"
                   >
                     {tag}
                   </Link>
@@ -56,7 +65,7 @@ export function PostCard({ post }: { post: Post }) {
             </>
           ) : null}
         </div>
-        <CardTitle className="text-balance text-xl tracking-tight">
+        <CardTitle className="text-xl tracking-tight text-balance">
           <Link
             href={post.url}
             className="transition-colors hover:text-foreground"

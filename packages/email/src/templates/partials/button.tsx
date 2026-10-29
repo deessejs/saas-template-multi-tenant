@@ -11,7 +11,7 @@ export function CTAButton(props: ButtonProps) {
   return (
     <Button
       {...props}
-      className={`rounded-md bg-brand px-6 py-3 text-center text-base font-medium text-brandText ${props.className ?? ""}`}
+      className={`bg-brand text-brandText rounded-md px-6 py-3 text-center text-base font-medium ${props.className ?? ""}`}
     />
   )
 }

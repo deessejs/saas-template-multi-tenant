@@ -61,12 +61,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: post.tags.length > 0 ? 0.7 : 0.6,
   }))
 
-  const changelogEntries: MetadataRoute.Sitemap = allReleases.map((release) => ({
-    url: `${APP_URL}${release.url}`,
-    lastModified: release.date,
-    changeFrequency: "monthly" as const,
-    priority: 0.6,
-  }))
+  const changelogEntries: MetadataRoute.Sitemap = allReleases.map(
+    (release) => ({
+      url: `${APP_URL}${release.url}`,
+      lastModified: release.date,
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    })
+  )
 
   const authorPages: MetadataRoute.Sitemap = allAuthors.map((author) => ({
     url: `${APP_URL}/blog/author/${encodeURIComponent(author.handle)}`,

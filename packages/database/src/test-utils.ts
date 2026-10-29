@@ -29,7 +29,7 @@ export const setupTestDb = async (): Promise<Drizzle> => {
   _testDb = drizzle(_pglite, { schema })
   const { apply } = await pushSchema(
     schema,
-    _testDb as unknown as Parameters<typeof pushSchema>[1],
+    _testDb as unknown as Parameters<typeof pushSchema>[1]
   )
   await apply()
   return _testDb

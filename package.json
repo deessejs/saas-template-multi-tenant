@@ -20,13 +20,12 @@
   "devDependencies": {
     "@changesets/changelog-git": "catalog:",
     "@changesets/cli": "catalog:",
-    "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
-    "prettier": "^3.9.4",
-    "prettier-plugin-tailwindcss": "^0.8.0",
     "turbo": "^2.10.4",
     "typescript": "catalog:",
-    "zod": "catalog:"
+    "zod": "catalog:",
+    "oxlint": "catalog:",
+    "oxfmt": "catalog:"
   },
   "pnpm": {
     "overrides": {

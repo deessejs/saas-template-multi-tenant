@@ -4,17 +4,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "lint": "eslint --max-warnings=0",
+    "lint": "pnpm --dir ../../ exec oxlint --config .oxlintrc.json packages/utils --deny-warnings",
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "format": "pnpm --dir ../../ exec oxfmt --config .oxfmtrc.json --ignore-path .oxfmtignore \"packages/utils/**/*.{ts,tsx}\""
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
-    "eslint": "catalog:",
     "vitest": "catalog:"
   }
 }

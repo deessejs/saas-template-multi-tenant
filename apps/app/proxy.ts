@@ -29,7 +29,7 @@ export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname
   const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))
   const isAuthPage = AUTH_PREFIXES.some(
-    (p) => pathname === p || pathname.startsWith(`${p}/`),
+    (p) => pathname === p || pathname.startsWith(`${p}/`)
   )
 
   // Only call getSession when the route actually needs the gate decision.

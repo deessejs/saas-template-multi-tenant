@@ -96,7 +96,7 @@ describe("mailer transport factory", () => {
         to: "u@example.com",
         subject: "test",
         react: "Plain text fallback" as unknown as React.ReactNode,
-      }),
+      })
     ).resolves.toMatchObject({ id: expect.stringMatching(/^console-/) })
   })
 })
@@ -118,7 +118,7 @@ describe("sendAuthEmail (fire-and-forget wrapper)", () => {
         to: "u@example.com",
         subject: "hi",
         tags: [{ name: "flow", value: "test" }],
-      }),
+      })
     )
   })
 })

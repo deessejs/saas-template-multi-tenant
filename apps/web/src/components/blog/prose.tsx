@@ -1,6 +1,10 @@
 import type { ComponentProps } from "react"
 
-export function Prose({ children, className, ...rest }: ComponentProps<"article">) {
+export function Prose({
+  children,
+  className,
+  ...rest
+}: ComponentProps<"article">) {
   return (
     <article
       className={[

@@ -13,12 +13,13 @@ export function VerifyEmail({ url, userEmail }: VerifyEmailProps) {
         Verify your email
       </Heading>
       <Text className="text-gray-700">
-        Thanks for signing up. Please confirm that <strong>{userEmail}</strong> is your email address.
+        Thanks for signing up. Please confirm that <strong>{userEmail}</strong>{" "}
+        is your email address.
       </Text>
       <Section className="my-6 text-center">
         <Button
           href={url}
-          className="rounded-md bg-brand px-6 py-3 text-center text-base font-medium text-brandText"
+          className="bg-brand text-brandText rounded-md px-6 py-3 text-center text-base font-medium"
         >
           Verify email
         </Button>

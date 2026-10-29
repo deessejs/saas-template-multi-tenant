@@ -43,8 +43,8 @@ function VerifyEmailPageContent() {
           <MailIcon className="size-5 text-muted-foreground" />
         </div>
         <p className="text-center text-sm text-muted-foreground">
-          Click the link in the email we sent you to verify your account.
-          The link expires in 24 hours.
+          Click the link in the email we sent you to verify your account. The
+          link expires in 24 hours.
         </p>
       </div>
 
@@ -57,7 +57,11 @@ function VerifyEmailPageContent() {
           disabled={resending}
           onClick={handleResend}
         >
-          {resending ? "Sending…" : resent ? "Email sent" : "Resend verification email"}
+          {resending
+            ? "Sending…"
+            : resent
+              ? "Email sent"
+              : "Resend verification email"}
         </Button>
       </div>
     </div>

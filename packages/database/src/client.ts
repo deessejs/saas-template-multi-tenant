@@ -67,7 +67,7 @@ function buildStub(): Drizzle {
         return undefined
       }
       throw new Error(
-        `[database] db.${String(prop)} accessed but DATABASE_URL is unset (CLI passthrough)`,
+        `[database] db.${String(prop)} accessed but DATABASE_URL is unset (CLI passthrough)`
       )
     },
   })
@@ -86,7 +86,7 @@ function buildReal(url: string): Drizzle {
 function getDb(): Drizzle {
   if (_db) return _db
 
-  // This is allowed for @workspace/env/server in eslint-config.
+  // Oxlint allows this specific require() to preserve lazy environment loading.
   const envModule = require("@workspace/env/server") as {
     serverEnv: { DATABASE_URL: string | undefined }
   }

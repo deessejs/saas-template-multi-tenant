@@ -7,7 +7,8 @@ export default function EmailPage() {
       <div>
         <h1 className="text-2xl font-bold">Change email</h1>
         <p className="text-sm text-muted-foreground">
-          Update your account email address. A verification link will be sent to the new address.
+          Update your account email address. A verification link will be sent to
+          the new address.
         </p>
       </div>
 

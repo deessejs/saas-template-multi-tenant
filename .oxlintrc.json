@@ -1,0 +1,160 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript"],
+  "categories": {
+    "correctness": "error"
+  },
+  "env": {
+    "builtin": true
+  },
+  "settings": {
+    "react": {
+      "version": "19.0.0"
+    }
+  },
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/.next/**",
+    "**/.turbo/**",
+    "**/coverage/**",
+    "**/dist/**",
+    "**/.content-collections/**"
+  ],
+  "options": {
+    "reportUnusedDisableDirectives": "error"
+  },
+  "rules": {
+    "typescript/ban-ts-comment": "error",
+    "typescript/no-array-constructor": "error",
+    "typescript/no-duplicate-enum-values": "error",
+    "typescript/no-empty-object-type": "error",
+    "typescript/no-explicit-any": "error",
+    "typescript/no-extra-non-null-assertion": "error",
+    "typescript/no-misused-new": "error",
+    "typescript/no-namespace": "error",
+    "typescript/no-non-null-asserted-optional-chain": "error",
+    "typescript/no-require-imports": [
+      "error",
+      {
+        "allow": ["^@workspace/env/server$"]
+      }
+    ],
+    "typescript/no-this-alias": "error",
+    "typescript/no-unnecessary-type-constraint": "error",
+    "typescript/no-unsafe-declaration-merging": "error",
+    "typescript/no-unsafe-function-type": "error",
+    "typescript/no-unused-expressions": "error",
+    "typescript/no-unused-vars": "error",
+    "typescript/no-wrapper-object-types": "error",
+    "typescript/prefer-as-const": "error",
+    "typescript/prefer-namespace-keyword": "error",
+    "typescript/triple-slash-reference": "error"
+  },
+  "overrides": [
+    {
+      "files": [
+        "apps/app/**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}",
+        "apps/web/**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}",
+        "apps/docs/**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}",
+        "packages/email/**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}"
+      ],
+      "plugins": ["typescript", "react"],
+      "rules": {
+        "react/display-name": "error",
+        "react/jsx-key": "error",
+        "react/jsx-no-comment-textnodes": "error",
+        "react/jsx-no-duplicate-props": "error",
+        "react/jsx-no-target-blank": "error",
+        "react/jsx-no-undef": "error",
+        "react/no-danger-with-children": "error",
+        "react/no-direct-mutation-state": "error",
+        "react/no-find-dom-node": "error",
+        "react/no-is-mounted": "error",
+        "react/no-render-return-value": "error",
+        "react/no-string-refs": "error",
+        "react/no-unescaped-entities": "error",
+        "react/no-unknown-property": "error",
+        "react/forbid-elements": [
+          "warn",
+          {
+            "forbid": [
+              {
+                "element": "input",
+                "message": "Use <Input /> from @workspace/ui/components/input (or <InputField /> wrapper in apps/app/components/auth/field.tsx)."
+              },
+              {
+                "element": "button",
+                "message": "Use <Button /> from @workspace/ui/components/button with variant/size props."
+              },
+              {
+                "element": "select",
+                "message": "Use <Select /> from @workspace/ui/components/select."
+              },
+              {
+                "element": "textarea",
+                "message": "Use <Textarea /> from @workspace/ui/components/textarea."
+              }
+            ]
+          }
+        ],
+        "react/rules-of-hooks": "error",
+        "react/exhaustive-deps": "warn",
+        "react/static-components": "error",
+        "react/use-memo": "error",
+        "react/preserve-manual-memoization": "error",
+        "react/incompatible-library": "warn",
+        "react/immutability": "error",
+        "react/globals": "error",
+        "react/refs": "error",
+        "react/set-state-in-effect": "error",
+        "react/error-boundaries": "error",
+        "react/purity": "error",
+        "react/set-state-in-render": "error",
+        "react/unsupported-syntax": "warn"
+      }
+    },
+    {
+      "files": [
+        "apps/app/**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}",
+        "apps/web/**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}",
+        "apps/docs/**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}"
+      ],
+      "plugins": ["typescript", "react", "nextjs"],
+      "rules": {
+        "nextjs/google-font-display": "warn",
+        "nextjs/google-font-preconnect": "warn",
+        "nextjs/next-script-for-ga": "warn",
+        "nextjs/no-async-client-component": "warn",
+        "nextjs/no-before-interactive-script-outside-document": "warn",
+        "nextjs/no-css-tags": "warn",
+        "nextjs/no-head-element": "warn",
+        "nextjs/no-html-link-for-pages": "error",
+        "nextjs/no-img-element": "warn",
+        "nextjs/no-page-custom-font": "warn",
+        "nextjs/no-styled-jsx-in-document": "warn",
+        "nextjs/no-sync-scripts": "error",
+        "nextjs/no-title-in-document-head": "warn",
+        "nextjs/no-typos": "warn",
+        "nextjs/no-unwanted-polyfillio": "warn",
+        "nextjs/inline-script-id": "error",
+        "nextjs/no-assign-module-variable": "error",
+        "nextjs/no-document-import-in-page": "error",
+        "nextjs/no-duplicate-head": "error",
+        "nextjs/no-head-import-in-document": "error",
+        "nextjs/no-script-component-in-head": "error"
+      }
+    },
+    {
+      "files": ["**/*.{js,jsx,mjs,cjs}"],
+      "plugins": ["eslint"],
+      "rules": {
+        "eslint/no-undef": "error"
+      },
+      "env": {
+        "node": true,
+        "browser": true,
+        "es2025": true
+      }
+    }
+  ]
+}

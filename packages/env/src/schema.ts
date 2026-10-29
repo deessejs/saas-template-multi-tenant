@@ -24,9 +24,12 @@ import { z } from "zod"
  * suite run without env vars while still enforcing it at prod startup.
  */
 
-const csv = z
-  .string()
-  .transform((s) => s.split(",").map((p) => p.trim()).filter(Boolean))
+const csv = z.string().transform((s) =>
+  s
+    .split(",")
+    .map((p) => p.trim())
+    .filter(Boolean)
+)
 
 export const serverSchema = z.object({
   NODE_ENV: z
@@ -47,18 +50,13 @@ export const serverSchema = z.object({
 
   // Mailer — Resend (prod)
   RESEND_API_KEY: z.string().optional(),
-  RESEND_FROM_EMAIL: z
-    .string()
-    .email()
-    .default("onboarding@resend.dev"),
+  RESEND_FROM_EMAIL: z.string().email().default("onboarding@resend.dev"),
   RESEND_FROM_NAME: z.string().min(1).default("SaaS Template"),
 
   // Mailer — transport selector
   //   "console" (default) → logs to stdout, zero infrastructure
   //   "resend"            → production, uses RESEND_API_KEY
-  MAIL_TRANSPORT: z
-    .enum(["console", "resend"])
-    .default("console"),
+  MAIL_TRANSPORT: z.enum(["console", "resend"]).default("console"),
 })
 
 /**

@@ -22,7 +22,7 @@
   },
   "types": "./dist/index.d.ts",
   "scripts": {
-    "lint": "eslint --max-warnings=0",
+    "lint": "pnpm --dir ../../ exec oxlint --config .oxlintrc.json packages/database --deny-warnings",
     "build": "tsc --rewriteRelativeImportExtensions",
     "test": "vitest",
     "test:run": "vitest run",
@@ -32,7 +32,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "db:check": "drizzle-kit check"
+    "db:check": "drizzle-kit check",
+    "format": "pnpm --dir ../../ exec oxfmt --config .oxfmtrc.json --ignore-path .oxfmtignore \"packages/database/**/*.{ts,tsx}\""
   },
   "dependencies": {
     "@workspace/env": "workspace:*",
@@ -42,11 +43,9 @@
   "devDependencies": {
     "@electric-sql/pglite": "catalog:",
     "@types/node": "catalog:",
-    "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "dotenv": "catalog:",
     "drizzle-kit": "catalog:",
-    "eslint": "catalog:",
     "vitest": "catalog:"
   }
 }

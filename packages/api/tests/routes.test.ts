@@ -5,7 +5,9 @@ describe("API routes", () => {
   describe("health endpoints", () => {
     it("should have health check pattern", async () => {
       const app = new Hono()
-      app.get("/health", (c) => c.json({ status: "ok", timestamp: new Date().toISOString() }))
+      app.get("/health", (c) =>
+        c.json({ status: "ok", timestamp: new Date().toISOString() })
+      )
 
       const res = await app.request("/health")
       expect(res.status).toBe(200)

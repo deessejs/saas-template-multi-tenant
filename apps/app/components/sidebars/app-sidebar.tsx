@@ -30,11 +30,7 @@ function HomeShortcut() {
   const pathname = usePathname()
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton
-        asChild
-        tooltip="Home"
-        isActive={pathname === "/home"}
-      >
+      <SidebarMenuButton asChild tooltip="Home" isActive={pathname === "/home"}>
         <Link href="/home">
           <Home />
           <span>Home</span>
@@ -77,9 +73,7 @@ function isSettingsPath(pathname: string): boolean {
   return pathname === "/settings" || pathname.startsWith("/settings/")
 }
 
-export function AppSidebar({
-  ...props
-}: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
   const inSettings = isSettingsPath(pathname)
 
@@ -95,7 +89,7 @@ export function AppSidebar({
               tooltip={APP_NAME}
             >
               <Link href="/home">
-                <span className="flex size-8 items-center justify-center rounded-md bg-primary text-primary-foreground text-sm">
+                <span className="flex size-8 items-center justify-center rounded-md bg-primary text-sm text-primary-foreground">
                   {APP_NAME.charAt(0)}
                 </span>
                 <span>{APP_NAME}</span>

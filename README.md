@@ -33,7 +33,6 @@ Monorepo template for building SaaS applications with modern tooling.
 │   ├── auth/         # better-auth
 │   ├── api/          # Hono + orpc
 │   ├── ui/           # Shared UI components
-│   ├── eslint-config/# ESLint configuration
 │   └── typescript-config/# TypeScript configuration
 ├── turbo.json
 ├── pnpm-workspace.yaml

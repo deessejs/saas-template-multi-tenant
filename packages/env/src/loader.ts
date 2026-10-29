@@ -11,8 +11,11 @@ const { loadEnvConfig } = require("@next/env") as {
     projectDir: string,
     dev?: boolean,
     log?: unknown,
-    forceReload?: boolean,
-  ) => { combinedEnv: Record<string, string | undefined>; loadedEnvFiles: unknown[] }
+    forceReload?: boolean
+  ) => {
+    combinedEnv: Record<string, string | undefined>
+    loadedEnvFiles: unknown[]
+  }
 }
 
 /**

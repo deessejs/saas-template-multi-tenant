@@ -5,7 +5,10 @@ import { EyeIcon, EyeOffIcon } from "lucide-react"
 import { Input } from "@workspace/ui/components/input"
 import { Button } from "@workspace/ui/components/button"
 
-interface PasswordInputProps extends Omit<React.ComponentProps<typeof Input>, "type"> {
+interface PasswordInputProps extends Omit<
+  React.ComponentProps<typeof Input>,
+  "type"
+> {
   error?: boolean
 }
 
@@ -34,7 +37,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
           variant="ghost"
           size="sm"
           aria-label={visible ? "Hide password" : "Show password"}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+          className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground hover:text-foreground"
           onClick={() => setVisible((v) => !v)}
         >
           {visible ? (

@@ -23,7 +23,10 @@ describe("user CRUD against PGlite", () => {
       emailVerified: false,
     })
 
-    const [row] = await db.select().from(schema.user).where(eq(schema.user.id, id))
+    const [row] = await db
+      .select()
+      .from(schema.user)
+      .where(eq(schema.user.id, id))
     expect(row?.email).toBe("alice@example.com")
     expect(row?.name).toBe("Alice")
     expect(row?.emailVerified).toBe(false)
@@ -44,7 +47,7 @@ describe("user CRUD against PGlite", () => {
         name: "Bob2",
         email,
         emailVerified: false,
-      }),
+      })
     ).rejects.toThrow()
   })
 })

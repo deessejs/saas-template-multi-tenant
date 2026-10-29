@@ -4,8 +4,7 @@ import { auth } from "./setup.js"
 import { serverEnv } from "@workspace/env/server"
 
 describe("auth email callbacks", () => {
-  const hasDatabase =
-    !!serverEnv.TEST_DATABASE_URL || !!serverEnv.DATABASE_URL
+  const hasDatabase = !!serverEnv.TEST_DATABASE_URL || !!serverEnv.DATABASE_URL
 
   describe("configuration", () => {
     it("should have sendResetPassword wired", () => {
@@ -14,17 +13,17 @@ describe("auth email callbacks", () => {
       // exercise the full path with vi.spyOn.
       expect(auth.options.emailAndPassword?.sendResetPassword).toBeDefined()
       expect(typeof auth.options.emailAndPassword?.sendResetPassword).toBe(
-        "function",
+        "function"
       )
     })
 
     it("should have sendVerificationEmail wired", () => {
       expect(
-        auth.options.emailVerification?.sendVerificationEmail,
+        auth.options.emailVerification?.sendVerificationEmail
       ).toBeDefined()
-      expect(
-        typeof auth.options.emailVerification?.sendVerificationEmail,
-      ).toBe("function")
+      expect(typeof auth.options.emailVerification?.sendVerificationEmail).toBe(
+        "function"
+      )
     })
   })
 
@@ -52,7 +51,7 @@ describe("auth email callbacks", () => {
             to: user.email,
             subject: "Reset your password",
             tags: [{ name: "flow", value: "reset-password" }],
-          }),
+          })
         )
 
         // Cleanup
@@ -78,7 +77,7 @@ describe("auth email callbacks", () => {
           expect.objectContaining({
             subject: "Verify your email",
             tags: [{ name: "flow", value: "verify-email" }],
-          }),
+          })
         )
 
         spy.mockRestore()
