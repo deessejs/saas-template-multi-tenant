@@ -27,11 +27,12 @@ export default function BlogPage() {
   return (
     <section className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
       <header className="mb-8">
-        <h1 className="text-balance text-4xl font-bold tracking-tighter sm:text-5xl">
+        <h1 className="text-4xl font-bold tracking-tighter text-balance sm:text-5xl">
           Blog
         </h1>
-        <p className="mt-2 text-pretty text-lg text-muted-foreground">
+        <p className="mt-2 text-lg text-pretty text-muted-foreground">
           Articles and updates. Subscribe via{" "}
+          {/* oxlint-disable-next-line nextjs/no-html-link-for-pages */}
           <a
             href="/blog/feed.xml"
             className="underline underline-offset-4 hover:text-foreground"
@@ -48,14 +49,11 @@ export default function BlogPage() {
           className="mb-8 flex flex-wrap items-center justify-between gap-2 border-y border-border/40 py-4"
         >
           <div className="flex flex-wrap items-center gap-2">
-            <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+            <span className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
               Topics
             </span>
             {tags.map((tag) => (
-              <Link
-                key={tag}
-                href={`/blog/tag/${encodeURIComponent(tag)}`}
-              >
+              <Link key={tag} href={`/blog/tag/${encodeURIComponent(tag)}`}>
                 <Badge
                   variant="outline"
                   className="cursor-pointer transition-colors hover:bg-foreground hover:text-background"
@@ -71,11 +69,12 @@ export default function BlogPage() {
 
       {posts.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border/60 bg-card/30 px-6 py-16 text-center">
-          <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+          <p className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
             No posts yet
           </p>
-          <p className="mt-3 max-w-md text-pretty text-base text-muted-foreground">
+          <p className="mt-3 max-w-md text-base text-pretty text-muted-foreground">
             Subscribe to the{" "}
+            {/* oxlint-disable-next-line nextjs/no-html-link-for-pages */}
             <a
               href="/blog/feed.xml"
               className="font-medium text-foreground underline underline-offset-4 hover:text-foreground/80"
@@ -113,7 +112,7 @@ export default function BlogPage() {
                         {featured.tags.slice(0, 2).map((tag) => (
                           <span
                             key={tag}
-                            className="rounded-full border border-border/40 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider"
+                            className="rounded-full border border-border/40 px-2 py-0.5 text-[10px] font-medium tracking-wider uppercase"
                           >
                             {tag}
                           </span>
@@ -128,8 +127,7 @@ export default function BlogPage() {
                     {featured.description}
                   </p>
                   <p className="mt-3 text-sm text-muted-foreground">
-                    by{" "}
-                    {featured.authors[0]?.name ?? featured.author?.name}
+                    by {featured.authors[0]?.name ?? featured.author?.name}
                   </p>
                 </div>
               </Link>

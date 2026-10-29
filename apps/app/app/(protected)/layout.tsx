@@ -1,4 +1,8 @@
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@workspace/ui/components/sidebar"
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@workspace/ui/components/sidebar"
 
 import { APP_NAME } from "@workspace/ui/lib/config"
 import { AppSidebar } from "@/components/sidebars/app-sidebar"

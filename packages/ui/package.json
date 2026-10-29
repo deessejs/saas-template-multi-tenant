@@ -4,8 +4,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "lint": "eslint",
-    "format": "prettier --write \"**/*.{ts,tsx}\"",
+    "lint": "pnpm --dir ../../ exec oxlint --config .oxlintrc.json packages/ui --deny-warnings",
+    "format": "pnpm --dir ../../ exec oxfmt --config .oxfmtrc.json --ignore-path .oxfmtignore \"packages/ui/**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -30,9 +30,7 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
-    "eslint": "^9",
     "tailwindcss": "^4",
     "typescript": "catalog:"
   },

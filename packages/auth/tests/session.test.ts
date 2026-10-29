@@ -6,8 +6,7 @@ describe("auth session", () => {
   // Note: Integration tests with database require DATABASE_URL env var
   // Run with: TEST_DATABASE_URL=postgresql://... pnpm test
 
-  const hasDatabase =
-    !!serverEnv.TEST_DATABASE_URL || !!serverEnv.DATABASE_URL
+  const hasDatabase = !!serverEnv.TEST_DATABASE_URL || !!serverEnv.DATABASE_URL
 
   describe("configuration", () => {
     it("should have email and password enabled", () => {
@@ -84,7 +83,9 @@ describe("auth session", () => {
         const user = ctx.test.createUser()
         await ctx.test.saveUser(user)
 
-        const { session, headers, token } = await ctx.test.login({ userId: user.id })
+        const { session, headers, token } = await ctx.test.login({
+          userId: user.id,
+        })
 
         expect(session).toBeDefined()
         expect(session.userId).toBe(user.id)

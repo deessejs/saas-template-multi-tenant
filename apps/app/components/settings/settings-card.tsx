@@ -4,7 +4,11 @@ interface SettingsCardProps {
   children: React.ReactNode
 }
 
-export function SettingsCard({ title, description, children }: SettingsCardProps) {
+export function SettingsCard({
+  title,
+  description,
+  children,
+}: SettingsCardProps) {
   return (
     <div className="rounded-lg border">
       <div className="flex flex-col gap-1.5 border-b px-4 py-4">

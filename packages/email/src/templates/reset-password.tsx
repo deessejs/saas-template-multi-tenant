@@ -13,12 +13,13 @@ export function ResetPassword({ url, userEmail }: ResetPasswordProps) {
         Reset your password
       </Heading>
       <Text className="text-gray-700">
-        We received a request to reset the password for <strong>{userEmail}</strong>.
+        We received a request to reset the password for{" "}
+        <strong>{userEmail}</strong>.
       </Text>
       <Section className="my-6 text-center">
         <Button
           href={url}
-          className="rounded-md bg-brand px-6 py-3 text-center text-base font-medium text-brandText"
+          className="bg-brand text-brandText rounded-md px-6 py-3 text-center text-base font-medium"
         >
           Reset password
         </Button>

@@ -3,7 +3,11 @@
 import Link from "next/link"
 import { Menu } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
-import { Sheet, SheetContent, SheetTrigger } from "@workspace/ui/components/sheet"
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "@workspace/ui/components/sheet"
 import { APP_NAME } from "@workspace/ui/lib/config"
 
 const NAV_LINKS = [
@@ -37,13 +41,18 @@ function MobileNav() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Open navigation menu" className="sm:hidden">
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Open navigation menu"
+          className="sm:hidden"
+        >
           <Menu className="size-5" />
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="flex w-64 flex-col gap-6 p-6">
         <div className="flex items-center justify-between">
-          <Link href="/" className="font-semibold text-lg">
+          <Link href="/" className="text-lg font-semibold">
             {APP_NAME}
           </Link>
         </div>
@@ -77,7 +86,7 @@ export function SiteHeader() {
       <div className="mx-auto flex h-14 items-center justify-between px-4">
         <div className="flex items-center gap-4">
           <MobileNav />
-          <Link href="/" className="font-semibold text-lg">
+          <Link href="/" className="text-lg font-semibold">
             {APP_NAME}
           </Link>
           <DesktopNav />

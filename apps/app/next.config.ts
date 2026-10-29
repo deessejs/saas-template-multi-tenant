@@ -1,7 +1,12 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@workspace/ui", "@workspace/api", "@workspace/auth", "@workspace/database"],
+  transpilePackages: [
+    "@workspace/ui",
+    "@workspace/api",
+    "@workspace/auth",
+    "@workspace/database",
+  ],
   images: {
     remotePatterns: [
       {
@@ -22,6 +27,6 @@ const nextConfig: NextConfig = {
     // is safe.
     dangerouslyAllowLocalIP: true,
   },
-};
+}
 
-export default nextConfig;
+export default nextConfig

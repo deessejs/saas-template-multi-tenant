@@ -8,7 +8,7 @@ export const listUsers = base
     z.object({
       limit: z.number().int().min(1).max(100).optional().default(10),
       offset: z.number().int().min(0).optional().default(0),
-    }),
+    })
   )
   .handler(async () => {
     // TODO: Implement with @workspace/database
@@ -30,7 +30,7 @@ export const createUser = protectedBase
     z.object({
       name: z.string().min(1),
       email: z.string().email(),
-    }),
+    })
   )
   .handler(async ({ input }) => {
     // TODO: Implement with @workspace/database

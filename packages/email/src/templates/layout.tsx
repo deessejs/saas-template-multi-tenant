@@ -12,6 +12,8 @@ import {
 } from "@react-email/components"
 import type { ReactNode } from "react"
 
+const CURRENT_YEAR = new Date().getFullYear()
+
 interface BaseLayoutProps {
   /** Inbox preview text (50-90 chars). */
   preview: string
@@ -48,7 +50,7 @@ export function BaseLayout({ preview, children }: BaseLayoutProps) {
             <Hr className="my-4 border-gray-200" />
             <Section>
               <Text className="text-xs text-gray-500">
-                © {new Date().getFullYear()} SaaS Template. All rights reserved.
+                © {CURRENT_YEAR} SaaS Template. All rights reserved.
               </Text>
             </Section>
           </Container>

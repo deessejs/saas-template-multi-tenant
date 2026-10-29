@@ -17,12 +17,13 @@
   },
   "types": "./dist/index.d.ts",
   "scripts": {
-    "lint": "eslint --max-warnings=0",
+    "lint": "pnpm --dir ../../ exec oxlint --config .oxlintrc.json packages/api --deny-warnings",
     "build": "tsc",
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "format": "pnpm --dir ../../ exec oxfmt --config .oxfmtrc.json --ignore-path .oxfmtignore \"packages/api/**/*.{ts,tsx}\""
   },
   "dependencies": {
     "@better-auth/drizzle-adapter": "catalog:",
@@ -39,9 +40,7 @@
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
-    "eslint": "catalog:",
     "vitest": "catalog:"
   }
 }

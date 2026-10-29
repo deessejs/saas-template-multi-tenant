@@ -22,15 +22,12 @@ function validateServerEnv(): Readonly<ServerEnv> {
 
   const parsed = serverSchema.safeParse(process.env)
   if (!parsed.success) {
-    // eslint-disable-next-line no-console
     console.error("\n[env] Invalid environment variables:")
     for (const issue of parsed.error.issues) {
-      // eslint-disable-next-line no-console
       console.error(`  - ${issue.path.join(".")}: ${issue.message}`)
     }
-    // eslint-disable-next-line no-console
     console.error(
-      "\nCopy .env.example to .env at the repo root and fill in the values.\n",
+      "\nCopy .env.example to .env at the repo root and fill in the values.\n"
     )
     process.exit(1)
   }
@@ -62,36 +59,46 @@ function validateServerEnv(): Readonly<ServerEnv> {
  * shake the import if unused, but if a misuse leaks this module into a client
  * bundle, fail loudly at the first reference.
  */
-export const serverEnv: Readonly<ServerEnv> = new Proxy({} as Readonly<ServerEnv>, {
-  get(_target, prop) {
-    if (prop === "toJSON") return undefined
-    if (prop === "then") return undefined
-    if (prop === "Symbol(\"[object Object]\")") return undefined
-    if (prop === "getPrototypeOf") return undefined
-    if (prop === "propertyIsEnumerable") return undefined
+export const serverEnv: Readonly<ServerEnv> = new Proxy(
+  {} as Readonly<ServerEnv>,
+  {
+    get(_target, prop) {
+      if (prop === "toJSON") return undefined
+      if (prop === "then") return undefined
+      if (prop === 'Symbol("[object Object]")') return undefined
+      if (prop === "getPrototypeOf") return undefined
+      if (prop === "propertyIsEnumerable") return undefined
 
-    // Runtime guard: detect browser bundle leaks
-    if (prop === "toString" || prop === "valueOf" || typeof prop === "symbol") {
+      // Runtime guard: detect browser bundle leaks
+      if (
+        prop === "toString" ||
+        prop === "valueOf" ||
+        typeof prop === "symbol"
+      ) {
+        const value = validateServerEnv()
+        const descriptor = Object.getOwnPropertyDescriptor(
+          value,
+          prop as string
+        )
+        if (descriptor?.value) return descriptor.value
+      }
+
       const value = validateServerEnv()
-      const descriptor = Object.getOwnPropertyDescriptor(value, prop as string)
-      if (descriptor?.value) return descriptor.value
-    }
-
-    const value = validateServerEnv()
-    return (value as Record<string, unknown>)[prop as string]
-  },
-  has(_target, prop) {
-    const value = validateServerEnv()
-    return prop in (value as Record<string, unknown>)
-  },
-  ownKeys() {
-    return Reflect.ownKeys(validateServerEnv() as Record<string, unknown>)
-  },
-  getOwnPropertyDescriptor(_target, prop) {
-    const value = validateServerEnv()
-    return Object.getOwnPropertyDescriptor(
-      value as Record<string, unknown>,
-      prop,
-    )
-  },
-})
+      return (value as Record<string, unknown>)[prop as string]
+    },
+    has(_target, prop) {
+      const value = validateServerEnv()
+      return prop in (value as Record<string, unknown>)
+    },
+    ownKeys() {
+      return Reflect.ownKeys(validateServerEnv() as Record<string, unknown>)
+    },
+    getOwnPropertyDescriptor(_target, prop) {
+      const value = validateServerEnv()
+      return Object.getOwnPropertyDescriptor(
+        value as Record<string, unknown>,
+        prop
+      )
+    },
+  }
+)

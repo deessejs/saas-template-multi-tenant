@@ -12,13 +12,14 @@
   },
   "types": "./dist/auth.d.ts",
   "scripts": {
-    "lint": "eslint --max-warnings=0",
+    "lint": "pnpm --dir ../../ exec oxlint --config .oxlintrc.json packages/auth --deny-warnings",
     "build": "tsc",
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
-    "auth:generate": "pnpm exec auth generate --config ./src/auth.ts --output ../database/src/schema/auth.ts --yes"
+    "auth:generate": "pnpm exec auth generate --config ./src/auth.ts --output ../database/src/schema/auth.ts --yes",
+    "format": "pnpm --dir ../../ exec oxfmt --config .oxfmtrc.json --ignore-path .oxfmtignore \"packages/auth/**/*.{ts,tsx}\""
   },
   "dependencies": {
     "@better-auth/drizzle-adapter": "catalog:",
@@ -33,9 +34,7 @@
   "devDependencies": {
     "@types/node": "catalog:",
     "@types/pg": "catalog:",
-    "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
-    "eslint": "catalog:",
     "vitest": "catalog:"
   }
 }

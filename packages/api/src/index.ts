@@ -19,19 +19,20 @@ const BODY_PARSER_METHODS = new Set([
   "json",
   "text",
 ] as const)
-type BodyParserMethod = (typeof BODY_PARSER_METHODS extends Set<infer T> ? T : never)
+type BodyParserMethod =
+  typeof BODY_PARSER_METHODS extends Set<infer T> ? T : never
 
 // Shared Hono Variables: populated by the session middleware below so
 // downstream middleware and oRPC context can read `user`/`session` without
 // re-issuing `auth.api.getSession({ headers })` per procedure.
 export type ApiEnv = {
   Variables: {
-    user: NonNullable<
-      Awaited<ReturnType<typeof auth.api.getSession>>
-    >["user"] | null
-    session: NonNullable<
-      Awaited<ReturnType<typeof auth.api.getSession>>
-    >["session"] | null
+    user:
+      | NonNullable<Awaited<ReturnType<typeof auth.api.getSession>>>["user"]
+      | null
+    session:
+      | NonNullable<Awaited<ReturnType<typeof auth.api.getSession>>>["session"]
+      | null
   }
 }
 
@@ -41,10 +42,7 @@ export type ApiEnv = {
 const api = new Hono<ApiEnv>().basePath("/api")
 
 // CORS middleware (single source of truth, validated at the env-package boundary)
-api.use(
-  "*",
-  cors({ origin: serverEnv.ALLOWED_ORIGINS, credentials: true }),
-)
+api.use("*", cors({ origin: serverEnv.ALLOWED_ORIGINS, credentials: true }))
 
 // Logging middleware
 api.use("*", logger())
@@ -61,7 +59,9 @@ api.use("*", async (c, next) => {
 })
 
 // Health check
-api.get("/health", (c) => c.json({ status: "ok", timestamp: new Date().toISOString() }))
+api.get("/health", (c) =>
+  c.json({ status: "ok", timestamp: new Date().toISOString() })
+)
 api.get("/ready", async (c) => {
   try {
     // Ping Postgres before returning 200. db.execute throws on connection
@@ -92,13 +92,21 @@ api.use("/rpc/*", async (c, next) => {
   // (logger, rate limiter, etc.) reads the body before oRPC.
   const request = new Proxy(c.req.raw, {
     get(target, prop) {
-      if (typeof prop === "string" && BODY_PARSER_METHODS.has(prop as BodyParserMethod)) {
+      if (
+        typeof prop === "string" &&
+        BODY_PARSER_METHODS.has(prop as BodyParserMethod)
+      ) {
         switch (prop) {
-          case "arrayBuffer": return () => c.req.arrayBuffer()
-          case "blob":        return () => c.req.blob()
-          case "formData":    return () => c.req.formData()
-          case "json":        return () => c.req.json()
-          case "text":        return () => c.req.text()
+          case "arrayBuffer":
+            return () => c.req.arrayBuffer()
+          case "blob":
+            return () => c.req.blob()
+          case "formData":
+            return () => c.req.formData()
+          case "json":
+            return () => c.req.json()
+          case "text":
+            return () => c.req.text()
         }
       }
       return Reflect.get(target, prop, target)

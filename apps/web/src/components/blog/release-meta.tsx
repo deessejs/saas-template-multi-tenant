@@ -3,7 +3,10 @@ import { Badge } from "@workspace/ui/components/badge"
 import type { Release, ReleaseCategory } from "@/lib/blog/types"
 import { RELEASE_CATEGORY_LABELS } from "@/lib/blog/types"
 
-const CATEGORY_VARIANT: Record<ReleaseCategory, "default" | "secondary" | "outline"> = {
+const CATEGORY_VARIANT: Record<
+  ReleaseCategory,
+  "default" | "secondary" | "outline"
+> = {
   added: "default",
   changed: "secondary",
   fixed: "secondary",
@@ -20,11 +23,7 @@ export function ReleaseMeta({ release }: { release: Release }) {
           v{release.version}
         </code>
         {release.categories.map((cat) => (
-          <Badge
-            key={cat}
-            variant={CATEGORY_VARIANT[cat]}
-            className="text-xs"
-          >
+          <Badge key={cat} variant={CATEGORY_VARIANT[cat]} className="text-xs">
             {RELEASE_CATEGORY_LABELS[cat]}
           </Badge>
         ))}

@@ -27,11 +27,12 @@ export default function ChangelogPage() {
     <section className="mx-auto w-full max-w-3xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
       <header className="mb-8 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-balance text-4xl font-bold tracking-tighter sm:text-5xl">
+          <h1 className="text-4xl font-bold tracking-tighter text-balance sm:text-5xl">
             Changelog
           </h1>
-          <p className="mt-2 text-pretty text-lg text-muted-foreground">
+          <p className="mt-2 text-lg text-pretty text-muted-foreground">
             Public release notes. Subscribe via{" "}
+            {/* oxlint-disable-next-line nextjs/no-html-link-for-pages */}
             <a
               href="/changelog/feed.xml"
               className="underline underline-offset-4 hover:text-foreground"
@@ -50,7 +51,7 @@ export default function ChangelogPage() {
             <div className="flex-1">
               <div className="flex items-center gap-2">
                 <Sparkles className="size-4" aria-hidden />
-                <p className="font-mono text-xs uppercase tracking-widest text-background/70">
+                <p className="font-mono text-xs tracking-widest text-background/70 uppercase">
                   Latest release
                 </p>
               </div>
@@ -82,9 +83,7 @@ export default function ChangelogPage() {
       ) : null}
 
       {releases.length === 0 ? (
-        <p className="text-muted-foreground">
-          No releases yet.
-        </p>
+        <p className="text-muted-foreground">No releases yet.</p>
       ) : (
         <div>
           {groups.map((group, i) => (

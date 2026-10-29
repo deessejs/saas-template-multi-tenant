@@ -8,7 +8,7 @@ export function SiteHeader() {
   return (
     <header className="border-b">
       <div className="mx-auto flex h-14 items-center justify-between px-4">
-        <Link href="/" className="font-semibold text-lg">
+        <Link href="/" className="text-lg font-semibold">
           {APP_NAME}
         </Link>
 

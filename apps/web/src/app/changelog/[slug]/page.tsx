@@ -20,9 +20,11 @@ export function generateStaticParams(): Array<Params> {
   return allReleases.map((release) => ({ slug: release.slug }))
 }
 
-export async function generateMetadata(
-  { params }: { params: Promise<Params> },
-): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<Params>
+}): Promise<Metadata> {
   const { slug } = await params
   const release = getReleaseBySlug(slug)
   if (!release) return {}
@@ -40,9 +42,11 @@ export async function generateMetadata(
   }
 }
 
-export default async function ReleasePage(
-  { params }: { params: Promise<Params> },
-) {
+export default async function ReleasePage({
+  params,
+}: {
+  params: Promise<Params>
+}) {
   const { slug } = await params
   const release = getReleaseBySlug(slug)
   if (!release) notFound()
@@ -61,10 +65,10 @@ export default async function ReleasePage(
       </Link>
 
       <header className="mb-10">
-        <h1 className="text-balance text-4xl font-bold tracking-tighter sm:text-5xl">
+        <h1 className="text-4xl font-bold tracking-tighter text-balance sm:text-5xl">
           {release.title}
         </h1>
-        <p className="mt-4 text-pretty text-lg text-muted-foreground">
+        <p className="mt-4 text-lg text-pretty text-muted-foreground">
           {release.description}
         </p>
         <div className="mt-6">
@@ -79,7 +83,10 @@ export default async function ReleasePage(
       {(prev || next) && (
         <>
           <Separator className="my-12" />
-          <nav className="grid gap-4 sm:grid-cols-2" aria-label="Release navigation">
+          <nav
+            className="grid gap-4 sm:grid-cols-2"
+            aria-label="Release navigation"
+          >
             {prev ? (
               <Link
                 href={prev.url}

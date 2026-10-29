@@ -25,7 +25,10 @@ const posts = defineCollection({
     title: z.string().min(1).max(120),
     description: z.string().min(1).max(280),
     date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-    updated: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+    updated: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .optional(),
     tags: z.array(z.string()).default([]),
     author: z.string().min(1).optional(),
     authors: z.array(z.string().min(1)).default([]),
@@ -43,34 +46,27 @@ const posts = defineCollection({
       return context.skip(`scheduled for ${post.scheduled}`)
     }
 
-    const handles = post.authors.length > 0
-      ? post.authors
-      : post.author
-        ? [post.author]
-        : []
+    const handles =
+      post.authors.length > 0 ? post.authors : post.author ? [post.author] : []
     if (handles.length === 0) {
       throw new Error(
         `Post "${post.title}" has no author. Add \`author: <handle>\` or ` +
-          `\`authors: [handle, ...]\` to its frontmatter.`,
+          `\`authors: [handle, ...]\` to its frontmatter.`
       )
     }
 
     const resolvedAuthors = handles.map((handle) => {
-      const author = context.documents(authors).find(
-        (a) => a.handle === handle,
-      )
+      const author = context.documents(authors).find((a) => a.handle === handle)
       if (!author) {
         throw new Error(
           `Post "${post.title}" references unknown author "${handle}". ` +
-            `Add content/authors/${handle}.md or fix the frontmatter.`,
+            `Add content/authors/${handle}.md or fix the frontmatter.`
         )
       }
       return author
     })
 
-    const slug = post._meta.filePath
-      .replace(/^.*\//, "")
-      .replace(/\.mdx$/, "")
+    const slug = post._meta.filePath.replace(/^.*\//, "").replace(/\.mdx$/, "")
 
     const mdxCode = await compileMDX(context, post, {
       rehypePlugins: [
@@ -116,7 +112,7 @@ const releases = defineCollection({
           "removed",
           "deprecated",
           "security",
-        ]),
+        ])
       )
       .default([]),
     cover: z.string().optional(),

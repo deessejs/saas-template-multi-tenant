@@ -29,7 +29,9 @@
   },
   "scripts": {
     "build": "tsc",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "pnpm --dir ../../ exec oxlint --config .oxlintrc.json packages/env --deny-warnings",
+    "format": "pnpm --dir ../../ exec oxfmt --config .oxfmtrc.json --ignore-path .oxfmtignore \"packages/env/**/*.{ts,tsx}\""
   },
   "dependencies": {
     "@next/env": "catalog:",
@@ -37,7 +39,6 @@
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "typescript": "catalog:"
   }

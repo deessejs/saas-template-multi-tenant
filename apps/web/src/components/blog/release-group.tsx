@@ -5,7 +5,10 @@ import { cn } from "@workspace/ui/lib/utils"
 import type { Release, ReleaseCategory, ReleaseGroup } from "@/lib/blog/types"
 import { RELEASE_CATEGORY_LABELS } from "@/lib/blog/types"
 
-const CATEGORY_VARIANT: Record<ReleaseCategory, "default" | "secondary" | "outline"> = {
+const CATEGORY_VARIANT: Record<
+  ReleaseCategory,
+  "default" | "secondary" | "outline"
+> = {
   added: "default",
   changed: "secondary",
   fixed: "secondary",
@@ -22,11 +25,7 @@ function ReleaseGroupCard({ release }: { release: Release }) {
           v{release.version}
         </code>
         {release.categories.map((cat) => (
-          <Badge
-            key={cat}
-            variant={CATEGORY_VARIANT[cat]}
-            className="text-xs"
-          >
+          <Badge key={cat} variant={CATEGORY_VARIANT[cat]} className="text-xs">
             {RELEASE_CATEGORY_LABELS[cat]}
           </Badge>
         ))}
@@ -63,7 +62,7 @@ export function ReleaseGroupView({
     <section
       className={cn(
         "rounded-xl border border-border/40 bg-card/30 p-4 sm:p-6",
-        !isFirst && "mt-6",
+        !isFirst && "mt-6"
       )}
     >
       <header className="mb-2 flex items-center justify-between gap-3 border-b border-border/40 pb-3">
@@ -71,8 +70,9 @@ export function ReleaseGroupView({
           <h2 className="font-mono text-lg font-semibold tracking-tight text-foreground">
             v{group.label}.x
           </h2>
-          <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-            {group.releases.length} release{group.releases.length === 1 ? "" : "s"}
+          <span className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
+            {group.releases.length} release
+            {group.releases.length === 1 ? "" : "s"}
           </span>
         </div>
       </header>

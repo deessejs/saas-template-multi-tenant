@@ -12,9 +12,11 @@ export function generateStaticParams(): Array<Params> {
   return getAllTags().map((tag) => ({ tag: encodeURIComponent(tag) }))
 }
 
-export async function generateMetadata(
-  { params }: { params: Promise<Params> },
-): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<Params>
+}): Promise<Metadata> {
   const { tag } = await params
   const decoded = decodeURIComponent(tag)
   return {
@@ -23,9 +25,7 @@ export async function generateMetadata(
   }
 }
 
-export default async function TagPage(
-  { params }: { params: Promise<Params> },
-) {
+export default async function TagPage({ params }: { params: Promise<Params> }) {
   const { tag } = await params
   const decoded = decodeURIComponent(tag)
   const posts = getPostsByTag(decoded)
@@ -43,13 +43,13 @@ export default async function TagPage(
       </Link>
 
       <header className="mb-12 max-w-3xl">
-        <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
+        <p className="text-sm font-medium tracking-wide text-muted-foreground uppercase">
           Tag
         </p>
-        <h1 className="mt-2 text-balance text-4xl font-bold tracking-tighter sm:text-5xl">
+        <h1 className="mt-2 text-4xl font-bold tracking-tighter text-balance sm:text-5xl">
           {decoded}
         </h1>
-        <p className="mt-4 text-pretty text-lg text-muted-foreground">
+        <p className="mt-4 text-lg text-pretty text-muted-foreground">
           {posts.length} {posts.length === 1 ? "post" : "posts"} tagged with{" "}
           <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm text-foreground/80">
             {decoded}

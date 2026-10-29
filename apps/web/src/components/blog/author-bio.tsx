@@ -16,7 +16,11 @@ function SingleAuthorBlock({ author }: { author: Author }) {
 
   return (
     <div className="flex items-start gap-4">
-      <Link href={authorUrl} aria-label={`More from ${author.name}`} className="shrink-0">
+      <Link
+        href={authorUrl}
+        aria-label={`More from ${author.name}`}
+        className="shrink-0"
+      >
         <Avatar className="size-12 overflow-hidden rounded-full">
           {author.avatar ? (
             <AvatarNextImage src={author.avatar} alt={author.name} />
@@ -51,17 +55,13 @@ export function AuthorBio({
   author?: Author
 }) {
   const list: Author[] =
-    authors && authors.length > 0
-      ? authors
-      : author
-        ? [author]
-        : []
+    authors && authors.length > 0 ? authors : author ? [author] : []
 
   if (list.length === 0) return null
 
   return (
     <aside className="mt-12 rounded-xl border border-border/40 bg-muted/20 p-6">
-      <p className="mb-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+      <p className="mb-4 font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
         Written by
       </p>
       {list.length === 1 ? (

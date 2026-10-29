@@ -38,7 +38,7 @@ export function SearchDialog() {
   useEffect(() => {
     // Reset selection when results change (e.g., new search query)
     // This is intentional - we want to clear selection on new results
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    // oxlint-disable-next-line react/set-state-in-effect
     setSelectedIndex(-1)
   }, [results])
 
@@ -88,7 +88,7 @@ export function SearchDialog() {
       >
         <Search className="size-4" />
         <span className="hidden sm:inline">Search...</span>
-        <kbd className="hidden sm:inline text-[10px] font-mono text-muted-foreground/60">
+        <kbd className="hidden font-mono text-[10px] text-muted-foreground/60 sm:inline">
           ⌘K
         </kbd>
       </Button>
@@ -99,7 +99,10 @@ export function SearchDialog() {
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh]">
       <div
         className="absolute inset-0 bg-background/80 backdrop-blur-sm"
-        onClick={() => { setIsOpen(false); setQuery("") }}
+        onClick={() => {
+          setIsOpen(false)
+          setQuery("")
+        }}
       />
       <div className="relative z-10 w-full max-w-lg rounded-xl border border-border/40 bg-card shadow-xl">
         <div className="flex items-center gap-3 border-b border-border/40 px-4 py-3">
@@ -116,7 +119,10 @@ export function SearchDialog() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => { setIsOpen(false); setQuery("") }}
+            onClick={() => {
+              setIsOpen(false)
+              setQuery("")
+            }}
             className="text-muted-foreground hover:text-foreground"
           >
             <X className="size-4" />
@@ -141,23 +147,23 @@ export function SearchDialog() {
                     }}
                     className={cn(
                       "flex w-full flex-col items-start gap-0.5 px-4 py-2 text-left",
-                      selectedIndex === i
-                        ? "bg-muted"
-                        : "hover:bg-muted/50",
+                      selectedIndex === i ? "bg-muted" : "hover:bg-muted/50"
                     )}
                   >
                     <span className="flex items-center gap-2">
                       <span
                         className={cn(
-                          "rounded px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide",
+                          "rounded px-1.5 py-0.5 text-[10px] font-medium tracking-wide uppercase",
                           result.item.type === "post"
                             ? "bg-primary/10 text-primary"
-                            : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+                            : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                         )}
                       >
                         {result.item.type}
                       </span>
-                      <span className="text-sm font-medium">{result.item.title}</span>
+                      <span className="text-sm font-medium">
+                        {result.item.title}
+                      </span>
                     </span>
                     <span className="line-clamp-1 text-xs text-muted-foreground">
                       {result.item.description}

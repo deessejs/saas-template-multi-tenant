@@ -68,7 +68,7 @@ function getDb(): ReturnType<typeof drizzle> {
 Three deliberate choices:
 
 1. `let _db: … | null = null` is a **module-local cache slot**, not exported. This is the singleton. Since Node caches evaluated ESM modules per process, this slot lives for the lifetime of the process (or until HMR recreates the module — which the current code does not guard against with `globalThis`).
-2. `require("@workspace/env/server")` is a CommonJS-style dynamic require inside an ESM file. The comment notes this is "dynamic import to avoid ESM circular dependency issues while still loading env vars at runtime (not build time)." `require()` is allowed in the lint config for that path. A bare `import { serverEnv } from "@workspace/env/server"` would hoist evaluation; that is the entire point of not importing it eagerly — `validateServerEnv()` runs on `getDb()`, and the whole env validation chain (Zod safe-parse, `process.exit(1)` on failure) is hidden behind the lazy threshold.
+2. `require("@workspace/env/server")` is a CommonJS-style dynamic require inside an ESM file. The comment notes this is "dynamic import to avoid ESM circular dependency issues while still loading env vars at runtime (not build time)." Oxlint allows `require()` only for that path. A bare `import { serverEnv } from "@workspace/env/server"` would hoist evaluation; that is the entire point of not importing it eagerly — `validateServerEnv()` runs on `getDb()`, and the whole env validation chain (Zod safe-parse, `process.exit(1)` on failure) is hidden behind the lazy threshold.
 3. `{} as ReturnType<typeof drizzle>` is a **type-unsafe escape hatch** that buys CLI passthrough without writing a mock class. It is the most fragile line in the file; see §7 for a typed alternative.
 
 ### 2.4 The Proxy — `client.ts:46-52`
@@ -405,7 +405,7 @@ The same issue applies to `drizzle-kit generate` (walks the schema via `drizzle.
 const envModule = require("@workspace/env/server") as { serverEnv: { DATABASE_URL: string | undefined } }
 ```
 
-An `import { serverEnv } from "@workspace/env/server"` at the top of `client.ts` would force evaluation at module load — which is exactly the eager behaviour the Proxy is built to defeat. The `require()` is CommonJS, but Node.js supports `require()` inside ESM with a name path that resolves through the same module graph (`nodejs.org/api/modules.html`). Critically, the lint config allows it for `@workspace/env/server` only — the inline comment is explicit about that. The reason: `require()` does **not** hoist `serverEnv.DATABASE_URL` access into the importer; the access happens inside `getDb()`, lazy-aligned with the Proxy threshold.
+An `import { serverEnv } from "@workspace/env/server"` at the top of `client.ts` would force evaluation at module load — which is exactly the eager behaviour the Proxy is built to defeat. The `require()` is CommonJS, but Node.js supports `require()` inside ESM with a name path that resolves through the same module graph (`nodejs.org/api/modules.html`). Critically, the Oxlint config allows it for `@workspace/env/server` only — the inline comment is explicit about that. The reason: `require()` does **not** hoist `serverEnv.DATABASE_URL` access into the importer; the access happens inside `getDb()`, lazy-aligned with the Proxy threshold.
 
 ### 9.3 Why `{} as DrizzleClient` is type-unsafe but OK
 
@@ -471,7 +471,7 @@ import postgres from "postgres"
 import * as schema from "./schema/index.js"
 
 declare global {
-  // eslint-disable-next-line no-var
+  // oxlint-disable-next-line no-var
   var __workspace_db: PostgresJsDatabase<typeof schema> | undefined
 }
 
@@ -528,7 +528,7 @@ process.once("SIGINT",  closeDb)
 - **HMR leaks.** Without `globalThis`, Next.js dev server recreates `client.ts`'s module on every save, which recreates the pool. Slow Postgres connection errors are the symptom.
 - **Async init has a race.** If you ever `await` inside `getDb()`, two simultaneous calls can build two pools. Switch to Promise-caching.
 - **Workers don't share.** `node:worker_threads` and `cluster` each build their own `_db`. Cross-worker pooling needs process-level isolation; not solved in-file.
-- **`require()` is allowed in lint only for `@workspace/env/server`.** Adding other `require()` calls will fail lint, by design.
+- **`require()` is allowed by Oxlint only for `@workspace/env/server`.** Adding other `require()` calls will fail lint, by design.
 - **TypeScript cache false sense.** `db.select(...)` typechecks even in the stub branch. The new error-throwing stub Proxy (§11) is what surfaces misuse.
 
 ---

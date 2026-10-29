@@ -10,7 +10,11 @@
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "@better-auth/drizzle-adapter"
 import { testUtils } from "better-auth/plugins"
-import { setupTestDb, cleanup, type Drizzle } from "@workspace/database/test-utils"
+import {
+  setupTestDb,
+  cleanup,
+  type Drizzle,
+} from "@workspace/database/test-utils"
 import * as schema from "@workspace/database/schema"
 import { serverEnv } from "@workspace/env/server"
 import { sendAuthEmail, templates } from "@workspace/email"
@@ -55,9 +59,7 @@ export const auth = betterAuth({
       })
     },
   },
-  plugins: [
-    testUtils(),
-  ],
+  plugins: [testUtils()],
 })
 
 // Export types
